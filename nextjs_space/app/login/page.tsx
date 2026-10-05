@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect, Suspense } from "react";
+import { signIn, getProviders } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -11,7 +11,10 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams?.get?.("redirect") ?? "/";
+  const requestedRedirect = searchParams?.get?.("redirect") ?? "/";
+  const redirect = requestedRedirect.startsWith("/") && !requestedRedirect.startsWith("//") ? requestedRedirect : "/";
+  const [secureSignIn,setSecureSignIn]=useState(false);
+  useEffect(()=>{void getProviders().then(p=>setSecureSignIn(Boolean(p?.cognito)));},[]);
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,6 +66,10 @@ function LoginForm() {
           <p className="text-gray-600 mt-2">Sign in to continue shopping</p>
         </div>
 
+        {secureSignIn && <button onClick={()=>void signIn("cognito",{callbackUrl:redirect})}
+          className="w-full py-3 bg-purple-800 text-white rounded-full mb-4">
+          Continue with your secure account
+        </button>}
         {/* Google Sign In */}
         <button
           onClick={handleGoogleSignIn}

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: wellisha-api
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+server:
+  port: ${PORT:8080}
+  tomcat:
+    max-http-form-post-size: 16KB
+  error:
+    include-message: never
+    include-stacktrace: never
+  shutdown: graceful
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db
+logging:
+  structured:
+    format:
+      console: ecs

@@ -1,0 +1,18 @@
+{
+  "name": "wellisha-infrastructure",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && node --test test/*.test.cjs",
+    "synth": "npm run build && cdk synth"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.272.0",
+    "constructs": "10.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.8",
+    "aws-cdk": "2.1144.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,7 @@
+**/.gradle
+**/src
+**/build/classes
+**/build/tmp
+**/build/reports
+.env*
+

@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: wellisha-schema-initializer
+  main:
+    web-application-type: none
+logging:
+  structured:
+    format:
+      console: ecs

@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import CognitoProvider from "next-auth/providers/cognito";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
@@ -24,6 +25,8 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
+    cognitoAccessToken?: string;
+    cognitoExpiresAt?: number;
     id?: string;
     role?: string;
     profileComplete?: boolean;
@@ -64,8 +67,15 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-      allowDangerousEmailAccountLinking: true,
+      allowDangerousEmailAccountLinking: false,
     }),
+    ...(process.env.COGNITO_ISSUER && process.env.COGNITO_CLIENT_ID && process.env.COGNITO_CLIENT_SECRET
+      ? [CognitoProvider({
+          issuer: process.env.COGNITO_ISSUER,
+          clientId: process.env.COGNITO_CLIENT_ID,
+          clientSecret: process.env.COGNITO_CLIENT_SECRET,
+          checks: ["pkce", "state"],
+        })] : []),
   ],
   session: {
     strategy: "jwt",
@@ -95,7 +105,11 @@ export const authOptions: NextAuthOptions = {
     },
   },
   callbacks: {
-    async jwt({ token, user, trigger, session: updatedSession }) {
+    async jwt({ token, user, account, trigger, session: updatedSession }) {
+      if (account?.provider === "cognito") {
+        token.cognitoAccessToken = account.access_token;
+        token.cognitoExpiresAt = account.expires_at;
+      }
       if (user) {
         token.id = user.id;
         token.role = user.role;

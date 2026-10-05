@@ -46,25 +46,29 @@ Cognito access tokens. Tokens expire safely; token refresh/account linking is
 not implemented yet.
 
 The outbox relay requires WORKER_MODE=outbox-relay and configured SQS queue URLs.
-External payment/shipping/email/SMS consumers are not implemented; do not enable
-checkout or live side effects. Legacy unsafe order creation/verification now
-returns 503. The new order endpoint is disabled by default until payment,
-reservation expiry and provider acceptance tests pass.
+The worker artifact also supports payment, shipping, refund, email and sms modes,
+each with its own QUEUE_URL_<MODE>. Quotes, timed reservations, Razorpay capture,
+packing, Amazon purchase/private labels/tracking/cancellation, refunds and opted-in
+SES/SNS notifications are implemented. See [lifecycle](../docs/implementation/commerce-lifecycle.md)
+and [provider setup](../docs/implementation/provider-setup.md) for exact configuration
+and recovery. Legacy unsafe create/verify endpoints return 503. Checkout defaults
+to disabled until genuine account/provider acceptance and deployment gates pass.
 
 ## Security/observability
 
 The implemented wire contract lives in [contracts/openapi.json](contracts/openapi.json).
 See [contract workflow](contracts/README.md) for generated storefront DTO types
-and the route/HTTP response compatibility tests. Generated transport SDKs,
-parent-product variant grouping and browser acceptance remain separate work.
+and the route/HTTP response compatibility tests. Generated DTOs and transport,
+product variants/prepacked kits and fixture browser acceptance are implemented.
+Genuine Cognito/provider acceptance remains external work.
 
 Catalog/category/detail reads and owned cart operations now use API-controlled
 pricing. See [pricing rules](../docs/implementation/pricing-rules.md) for the four
 simple scheduled rule types, permission-scoped configuration read/write API,
 audit/version behavior, UI refresh and operator examples. Same-SKU offers do not
-stack. Stock is not reserved by a cart; checkout remains disabled until quotes,
-reservation expiry and provider acceptance pass. The product list is now a paged
-envelope in contract version 0.2.0. A pack/variant is a sellable SKU in this slice.
+stack. Stock is not reserved by a cart or quote; accepted orders reserve stock.
+Provider acceptance keeps checkout disabled. The product list is a paged envelope
+in contract version 0.3.0. Variants and prepacked kits are independent sellable SKUs.
 
 All repository values use JDBC parameters. Private responses use no-store.
 Credentials are never logged or included in API errors. Logs include correlation,

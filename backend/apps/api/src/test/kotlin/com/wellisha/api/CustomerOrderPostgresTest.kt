@@ -46,6 +46,7 @@ class CustomerOrderPostgresTest {
     @Autowired lateinit var mapper: ObjectMapper
     @Autowired lateinit var orders: OrderAndShipmentRepository
     @Autowired lateinit var customers: CustomerAddressRepository
+    @Autowired lateinit var checkout: CheckoutRepository
     @MockitoBean lateinit var decoder: JwtDecoder
 
     @BeforeEach fun freshSchema() {
@@ -88,7 +89,9 @@ class CustomerOrderPostgresTest {
         val id=address()
         jdbc.update("INSERT INTO commerce.product(id,name,sku,price_minor,stock,active) VALUES(?,?,?,?,?,?)",
             "p1","Pads","sku1",19900,2,true)
-        val input=mapper.writeValueAsString(CreateOrderInput(id,listOf(OrderLineInput("p1",1))))
+        val owner=customers.resolve("https://cognito-idp.ap-south-1.amazonaws.com/test_pool","alice").id
+        val quote=checkout.quote(owner,CreateOrderInput(id,listOf(OrderLineInput("p1",1))))
+        val input=mapper.writeValueAsString(AcceptQuoteInput(quote.id))
         val first=mvc.perform(post("/v1/orders").with(auth()).header("Idempotency-Key","checkout-request-0001")
             .contentType("application/json").content(input)).andExpect(status().isAccepted).andReturn()
         val orderId=mapper.readTree(first.response.contentAsString).get("id").asText()
@@ -103,7 +106,9 @@ class CustomerOrderPostgresTest {
         jdbc.update("INSERT INTO commerce.product(id,name,sku,price_minor,stock,active) VALUES(?,?,?,?,?,?)",
             "p1","Pads","sku1",19900,3,true)
         for(quantity in listOf(1,2)) {
-            val input=mapper.writeValueAsString(CreateOrderInput(id,listOf(OrderLineInput("p1",quantity))))
+            val owner=customers.resolve("https://cognito-idp.ap-south-1.amazonaws.com/test_pool","alice").id
+            val quote=checkout.quote(owner,CreateOrderInput(id,listOf(OrderLineInput("p1",quantity))))
+            val input=mapper.writeValueAsString(AcceptQuoteInput(quote.id))
             mvc.perform(post("/v1/orders").with(auth()).header("Idempotency-Key","checkout-request-0001")
                 .contentType("application/json").content(input)).andExpect(if(quantity==1) status().isAccepted else status().isConflict)
         }

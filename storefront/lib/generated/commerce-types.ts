@@ -113,6 +113,8 @@ export type ProductDetailView = {
   "product": ProductView;
   "pricedAt": string;
   "refreshAfterMs": number;
+  "variants": Array<ProductVariantView>;
+  "bundleContents": Array<BundleComponentView>;
 };
 
 export type OfferInput = {
@@ -163,4 +165,129 @@ export type PricingConfiguration = {
   "version": number;
   "basePriceMinor": number;
   "offers": Array<OfferInput>;
+};
+
+export type QuoteLine = {
+  "productId": string;
+  "quantity": number;
+  "basePriceMinor": number;
+  "discountMinor": number;
+  "totalMinor": number;
+  "priceVersion": number;
+};
+
+export type CheckoutQuote = {
+  "id": string;
+  "addressId": string;
+  "items": Array<QuoteLine>;
+  "subtotalMinor": number;
+  "shippingMinor": number;
+  "totalMinor": number;
+  "currency": "INR";
+  "expiresAt": string;
+};
+
+export type AcceptQuoteInput = {
+  "quoteId": string;
+};
+
+export type PaymentCheckout = {
+  "orderId": string;
+  "providerOrderId": string;
+  "keyId": string;
+  "amountMinor": number;
+  "currency": "INR";
+};
+
+export type RefundInput = {
+  "amountMinor": number;
+  "reason": string;
+};
+
+export type RefundView = {
+  "id": string;
+  "orderId": string;
+  "amountMinor": number;
+  "state": string;
+};
+
+export type ParcelInput = {
+  "weightGrams": number;
+  "lengthMm": number;
+  "widthMm": number;
+  "heightMm": number;
+  "items": Array<OrderLineInput>;
+};
+
+export type ParcelView = {
+  "id": string;
+  "orderId": string;
+  "state": string;
+  "version": number;
+};
+
+export type ReadyParcelInput = {
+  "version": number;
+};
+
+export type ShipmentDocumentLink = {
+  "url": string;
+  "expiresInSeconds": number;
+};
+
+export type NotificationPreferences = {
+  "emailEnabled": boolean;
+  "smsEnabled": boolean;
+  "version": number;
+};
+
+export type NotificationPreferenceInput = {
+  "emailEnabled": boolean;
+  "smsEnabled": boolean;
+  "version": number;
+};
+
+export type ProductVariantView = {
+  "id": string;
+  "slug": string;
+  "label": string;
+  "priceMinor": number;
+  "available": boolean;
+};
+
+export type StaffOrderLine = {
+  "productId": string;
+  "name": string;
+  "quantity": number;
+  "totalMinor": number;
+  "allocatedQuantity": number;
+};
+
+export type StaffOrderOperations = {
+  "order": OrderView;
+  "items": Array<StaffOrderLine>;
+  "parcels": Array<ParcelView>;
+  "refunds": Array<RefundView>;
+};
+
+export type ShipmentCancellationInput = {
+  "version": number;
+  "reason": string;
+};
+
+export type BundleComponentView = {
+  "productId": string;
+  "name": string;
+  "quantity": number;
+};
+
+export type BundleConfiguration = {
+  "version": number;
+  "items": Array<OrderLineInput>;
+};
+
+export type BundleInput = {
+  "version": number;
+  "items": Array<OrderLineInput>;
+  "reason": string;
 };

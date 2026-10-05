@@ -16,7 +16,7 @@ export function isCatalogPage(value: unknown): value is CatalogPage {
   return object(value) && timed(value) && money(value.page) && typeof value.hasMore === "boolean"
     && Array.isArray(value.items) && value.items.length <= 100 && value.items.every(isProduct);
 }
-export function isProductDetail(value: unknown): value is ProductDetailView { return object(value) && timed(value) && isProduct(value.product); }
+export function isProductDetail(value: unknown): value is ProductDetailView { return object(value) && timed(value) && isProduct(value.product) && Array.isArray(value.variants) && value.variants.length<=100 && value.variants.every(v=>object(v)&&['id','slug','label'].every(k=>typeof v[k]==='string')&&money(v.priceMinor)&&typeof v.available==='boolean') && Array.isArray(value.bundleContents) && value.bundleContents.length<=10 && value.bundleContents.every(c=>object(c)&&typeof c.productId==='string'&&typeof c.name==='string'&&money(c.quantity)&&c.quantity>=1&&c.quantity<=100); }
 export function isCategories(value: unknown): value is CategoryView[] {
   return Array.isArray(value) && value.every(v => object(v) && ["id", "name", "slug"].every(k => typeof v[k] === "string"));
 }

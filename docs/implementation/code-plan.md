@@ -2,6 +2,16 @@
 
 Status: implementation in progress. Kotlin + Spring Boot and PostgreSQL are confirmed. This is a brand-new backend application, with no legacy database or payment-data migration. Existing Next.js UI code remains in place. See backend/README.md for implemented components and remaining release gates.
 
+October 6 update: the web commerce lifecycle is implemented through quotes,
+reservations, Razorpay capture/reconciliation, staff packing, Amazon booking/labels/
+tracking/cancellation, bounded refunds and SES/SNS notifications. Variants,
+prepacked mixed-product kits and generated transport are included. Keep the four
+nonstacking pricing rules; kit contents are catalog data and kit stock is independent.
+The layout below is the broader target, not a claim that mobile/media modules exist.
+Use [execution status](execution-status.md) for actual results and
+[provider setup](provider-setup.md) as the parallel owner workstream. Deployment,
+real-account acceptance and commercial policy approval are required before launch.
+
 ## 1. Stack and scope
 
 | Layer | Language / technology | Decision |

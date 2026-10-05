@@ -120,6 +120,29 @@ export class WellishaFoundationStack extends Stack {
         environment.DATABASE_SECRET_ARN = workerSecret.secretArn;
         workerSecret.grantRead(role);
       }
+      const modes = ["payment", "shipping", "refund", "email", "sms"];
+      if (modes.includes(service)) {
+        environment.WORKER_MODE = service;
+        environment[`QUEUE_URL_${service.toUpperCase()}`] = queues[service].queueUrl;
+      }
+      const paymentArn = this.node.tryGetContext("razorpaySecretArn");
+      const shippingArn = this.node.tryGetContext("amazonShippingSecretArn");
+      const grantProvider = (arn: unknown, key: string) => {
+        if (arn === undefined) return; // desiredCount=0 until the release owner supplies configuration.
+        if (typeof arn !== "string" || !/^arn:aws:secretsmanager:[a-z0-9-]+:\d{12}:secret:[A-Za-z0-9/_+=.@-]+$/.test(arn)) throw new Error("Invalid provider secret ARN");
+        environment[key] = arn;
+        secrets.Secret.fromSecretCompleteArn(this, `${service}-${key}`, arn).grantRead(role);
+      };
+      if (["api", "payment", "refund"].includes(service)) grantProvider(paymentArn, "RAZORPAY_SECRET_ARN");
+      if (service === "shipping") grantProvider(shippingArn, "AMAZON_SHIPPING_SECRET_ARN");
+      if (["api", "shipping"].includes(service)) environment.SHIPMENT_DOCUMENT_BUCKET = documents.bucketName;
+      if (service === "api") documents.grantRead(role);
+      if (service === "email") role.addToPolicy(new iam.PolicyStatement({ actions: ["ses:SendEmail"], resources: [`arn:aws:ses:${this.region}:${this.account}:identity/*`] }));
+      if (service === "sms") {
+        // Direct phone-number publishing requires Resource '*'; deny all topic ARNs.
+        role.addToPolicy(new iam.PolicyStatement({ actions: ["sns:Publish"], resources: ["*"] }));
+        role.addToPolicy(new iam.PolicyStatement({ effect: iam.Effect.DENY, actions: ["sns:Publish"], resources: ["arn:aws:sns:*:*:*"] }));
+      }
       if (service === "outbox-relay") {
         environment.WORKER_MODE = "outbox-relay";
         for (const [kind, queue] of Object.entries(queues)) {

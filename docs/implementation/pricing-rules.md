@@ -12,8 +12,16 @@ path. Checkout remains disabled pending its existing acceptance gates.
 
 Each sellable SKU has a base price in paise and a list of scheduled offers. One
 offer may be active at a time. Offers never overlap or stack. All four types apply
-to the same SKU; this first version has no mixed-SKU bundles, separate gifts,
+to the same sellable SKU; there are no cross-SKU cart-matching offers, separate gifts,
 customer segments, coupon codes, custom scripts or nested conditions.
+
+Mixed-product bundles are supported as **prepacked kits** with their own SKU,
+base price, offers and stocked quantity. The product detail lists up to ten
+components. Assembly happens before sale; buying a kit reduces kit stock only.
+Use `GET/PATCH /v1/admin/products/{id}/bundle` with `wellisha/catalog.write` plus
+`catalog.bundle.write`, expected version, components and an audit reason. Contents
+changes advance the SKU pricing version, retain offer schedules and invalidate old
+quotes. Nested kits are rejected. This keeps the same four rules understandable.
 
 The API also returns a generated `offerSummary` such as “3 for ₹499” or “Buy 2,
 get 1 free. Add 3 units per group.” Marketing titles can change, but eligibility

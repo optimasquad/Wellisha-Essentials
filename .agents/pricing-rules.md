@@ -18,7 +18,10 @@ and [execution status](../docs/implementation/execution-status.md) before change
 - Preserve API `no-store`, bounded visible-tab refresh, focus/online refresh,
   customer isolation, and honest stale/error states. Avoid hard-coded promotions.
 - Update OpenAPI and regenerate checked-in TypeScript DTO types with every wire
-  change. Document any additional rule as an explicit commercial decision.
+  change, including the transport client. Mixed-product kits have their own SKU
+  and stocked inventory; never reserve components again at sale. Read the commerce
+  lifecycle guidance before checkout/provider changes. Document any additional
+  rule as an explicit commercial decision.
 - Run pricing domain tests, real PostgreSQL acceptance, storefront validators and
   TypeScript checks. Keep checkout disabled until quotes/reservations/providers
   satisfy the existing release gates. Never seed or alter an existing database

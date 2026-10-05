@@ -7,10 +7,16 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Repository
-class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mapper: ObjectMapper,private val catalog: CatalogPricingRepository) {
+class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mapper: ObjectMapper,private val catalog: CatalogPricingRepository,private val env: org.springframework.core.env.Environment) {
+    fun shipping(subtotal: Long): Long {
+        val fee=env.getProperty("CHECKOUT_SHIPPING_MINOR",Long::class.java,4900L)
+        val threshold=env.getProperty("CHECKOUT_FREE_SHIPPING_ABOVE_MINOR",Long::class.java,49900L)
+        require(fee in 0..1000000 && threshold>=0)
+        return if(subtotal>threshold) 0L else fee
+    }
 
     @Transactional
-    fun createOrder(customer: String,key: String,input: CreateOrderInput): OrderView {
+    fun createOrder(customer: String,key: String,input: CreateOrderInput,acceptedAt: java.time.Instant? = null): OrderView {
         require(key.matches(Regex("[A-Za-z0-9_-]{16,100}")))
         val requestHash = java.security.MessageDigest.getInstance("SHA-256")
             .digest(mapper.writeValueAsBytes(input)).joinToString("") { "%02x".format(it) }
@@ -36,7 +42,7 @@ class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mappe
             jdbc.sql("SELECT id FROM commerce.product WHERE id=:id AND active=true FOR UPDATE")
                 .param("id",line.productId).query(String::class.java).optional().orElseThrow { MissingResource() }
         }
-        val pricedAt=catalog.databaseTime()
+        val pricedAt=acceptedAt ?: catalog.databaseTime()
         data class PricedLine(val input: OrderLineInput,val product: ProductView,val discount: Long,val total: Long)
         val prices = input.items.sortedBy { it.productId }.map { line ->
             val product=catalog.productAt(line.productId,pricedAt)
@@ -47,8 +53,9 @@ class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mappe
         }
         val subtotal=Money.total(prices.map { it.total })
         // Existing store policy retained. Must be commercially approved before cutover.
-        val shipping=if(subtotal>49900L) 0L else 4900L
+        val shipping=shipping(subtotal)
         val total=Math.addExact(subtotal,shipping)
+        require(total<=9_007_199_254_740_991L)
         jdbc.sql("""INSERT INTO commerce.orders(id,customer_id,total_minor,currency,payment_state,fulfillment_state,
             address_snapshot,idempotency_key,request_hash) VALUES(:id,:customer,:total,'INR','PAYMENT_SETUP_PENDING',
             'AWAITING_PAYMENT',CAST(:address AS jsonb),:key,:hash)""")
@@ -61,19 +68,23 @@ class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mappe
                 .param("base",priced.product.basePriceMinor).param("discount",priced.discount).param("version",priced.product.priceVersion)
                 .param("offer",priced.product.offerTitle).update()
         }
+        val reservationSeconds=env.getProperty("CHECKOUT_RESERVATION_SECONDS",Long::class.java,900L)
+        require(reservationSeconds in 60..3600)
+        jdbc.sql("INSERT INTO commerce.stock_reservation(order_id,state,expires_at) VALUES(:order,'ACTIVE',clock_timestamp()+(:seconds * interval '1 second'))")
+            .param("order",id).param("seconds",reservationSeconds).update()
         jdbc.sql("INSERT INTO commerce.outbox(id,aggregate_id,event_type,payload) VALUES(:id,:order,'PaymentSetupRequested',CAST(:payload AS jsonb))")
             .param("id",UUID.randomUUID().toString()).param("order",id)
             .param("payload",mapper.writeValueAsString(mapOf("orderId" to id))).update()
         return order(customer,id)
     }
     fun order(customer: String,id: String): OrderView = jdbc.sql("""
-        SELECT id,total_minor,currency,payment_state,fulfillment_state,created_at FROM commerce.orders
+        SELECT id,total_minor,currency,payment_state,fulfillment_state,created_at FROM commerce.order_fulfillment_progress
         WHERE id=:id AND customer_id=:customer""").param("id",id).param("customer",customer)
         .query { rs,_ -> OrderView(rs.getString("id"),rs.getLong("total_minor"),rs.getString("currency"),
             rs.getString("payment_state"),rs.getString("fulfillment_state"),rs.getTimestamp("created_at").toInstant()) }
         .optional().orElseThrow { MissingResource() }
     fun orders(customer: String): List<OrderView> = jdbc.sql("""
-        SELECT id,total_minor,currency,payment_state,fulfillment_state,created_at FROM commerce.orders
+        SELECT id,total_minor,currency,payment_state,fulfillment_state,created_at FROM commerce.order_fulfillment_progress
         WHERE customer_id=:customer ORDER BY created_at DESC LIMIT 100""").param("customer",customer)
         .query { rs,_ -> OrderView(rs.getString("id"),rs.getLong("total_minor"),rs.getString("currency"),
             rs.getString("payment_state"),rs.getString("fulfillment_state"),rs.getTimestamp("created_at").toInstant()) }.list()

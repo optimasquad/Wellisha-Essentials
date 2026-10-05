@@ -20,6 +20,7 @@ class CustomerApiHttpTest {
     @Autowired lateinit var mvc: MockMvc
     @MockitoBean lateinit var customers: CustomerAddressRepository
     @MockitoBean lateinit var commerce: OrderAndShipmentRepository
+    @MockitoBean lateinit var checkout: CheckoutRepository
     @MockitoBean lateinit var decoder: JwtDecoder
     private fun auth() = jwt().jwt { it.subject("alice").claim("iss","https://cognito-idp.ap-south-1.amazonaws.com/test_pool") }
     @BeforeEach fun owner() {
@@ -55,7 +56,7 @@ class CustomerApiHttpTest {
     }
     @Test fun checkoutRemainsDisabledBeforeProviderAcceptance() {
         mvc.perform(post("/v1/orders").with(auth()).header("Idempotency-Key","test-order-request-01")
-            .contentType("application/json").content("""{"addressId":"a1","items":[{"productId":"p1","quantity":1}]}"""))
+            .contentType("application/json").content("""{"quoteId":"q1"}"""))
             .andExpect(status().isServiceUnavailable)
         verifyNoInteractions(commerce)
     }

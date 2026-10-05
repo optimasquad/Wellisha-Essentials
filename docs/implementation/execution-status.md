@@ -1,82 +1,72 @@
 # Implementation status
 
-This is a new Kotlin/Spring Boot backend, not a legacy-system migration.
-The existing Next.js UI is being connected to it. No existing database schema
-or data has been changed by backend initialization.
+Updated October 6, 2026. The implemented commerce scope is ready for review in
+PR #1. Provider onboarding, environment configuration and external acceptance
+remain open; this is not a production launch.
 
-Implemented foundation:
+## Implemented
 
-- API, outbox relay and one-shot CommerceSchemaInitializer executables.
-- Parameterized PostgreSQL repositories, customer ownership checks, validated
-  inputs, exact minor-unit amounts, idempotent order creation and durable outbox.
-- Cognito access-token validation, safe API errors, correlation IDs and request
-  diagnostics without bodies, tokens or secret exception messages.
-- Initial UI BFF, owned order/tracking pages, addresses and message inbox.
-- Recovered storefront rename and media paths; customer address editing,
-  message read state and sequential order/tracking polling with account isolation.
-- 16 KB request-byte limits in both the storefront BFF and Kotlin API,
-  including streamed bodies without Content-Length; compressed bodies rejected.
-- Shared OpenAPI contract for all 20 implemented controller operations;
-  generated storefront DTO types used by address, message and shipment screens.
-  Contract checks cover controller route parity and real HTTP response shapes.
-  Scheduled four-rule pricing, paged catalog/category/detail reads and owned
-  cart CRUD now share API-controlled prices with versioned, audited staff writes.
-  Transport SDK generation and parent-product variant grouping remain planned.
-- Commerce-mode home, collection, detail, cart and announcement strip read current
-  API prices, offer summaries and savings. Visible views refresh within 15 seconds,
-  sooner at schedule boundaries and on focus/online events; hidden tabs pause.
-  Prisma compatibility UI remains available when COMMERCE_API_URL is absent.
-- Independent ECS service definitions, private encrypted RDS/S3, SQS/DLQs,
-  CloudWatch alarms and optional AWS validation pipeline.
+- Independent `wellisha-services` backend and `storefront` UI projects in one repo;
+  API, schema initializer and worker build artifacts.
+- Cognito token validation, owned addresses/carts/orders/tracking/inbox, scoped
+  staff grants, safe errors, bounded bodies and redacted diagnostics.
+- API-controlled percentage, fixed-amount, group-price and buy-X-get-Y offers;
+  non-overlapping schedules, optimistic versions and audit history. Visible UI
+  refreshes within 15 seconds and on focus/online without a UI release.
+- Product families/variants and mixed-product prepacked kits with independent
+  stock, declared contents and no nested/cross-SKU cart rules.
+- Owned expiring quotes, explicit total confirmation, changed-version rejection,
+  immutable orders, retry recovery, concurrent stock protection and timed expiry.
+- Razorpay order adapter, signed raw-body durable webhook inbox, capture binding,
+  late-payment review and GET reconciliation of uncertain outcomes.
+- Staff parcel allocations/measurements, packed-ready confirmation, Amazon rates,
+  single purchase attempt, private labels/document recovery and ordered tracking.
+- Separate carrier cancellation and bounded full/partial refunds with staff
+  reasons, durable attempts, provider reconciliation and audit records.
+- Outbox/SQS consumers for payment, shipping, refund, SES email and SNS SMS;
+  verified-contact opt-in, approved SMS text mapping and uncertain-send review.
+- OpenAPI 0.3.0 and checked-in TypeScript DTO/transport generation, checkout,
+  secure commerce sign-in/signup, staff operations and notification settings UI.
+- ECS worker modes, queue routing, narrow optional provider-secret grants and
+  private label access. Services remain at zero tasks and checkout disabled.
 
-Verification:
+## Verification
 
-- October 5 recovery verification: backend build and all three boot JARs passed;
-  33 unit/HTTP tests passed (22 API/security and 11 domain tests).
-- Infrastructure: four tests passed on the recovery run.
-- UI: nine security/body-limit tests and TypeScript check passed.
-- October 5 resumed work: 36 backend unit/HTTP tests (25 API/security/contract
-  and 11 domain) and all three boot JARs passed; 12 storefront tests, TypeScript
-  check and generated contract/type consistency check passed.
-- October 5 resumed PostgreSQL verification: all nine real integration tests
-  passed against isolated PostgreSQL 17.9 containers. Docker Desktop's Linux
-  engine is now running (29.8.2). The successful command uses its active pipe and
-  a fresh Gradle process. Tests run in UTC and initialize the commerce schema
-  explicitly; Spring's test-only Flyway auto-start is disabled. This supersedes
-  the earlier recovery-time Docker startup failure.
+Latest local checks: 49 backend unit/HTTP/provider tests, 36 real PostgreSQL 17.9
+integration scenarios and all three boot JARs passed. Storefront: 23 tests,
+TypeScript and generated DTO/client consistency checks passed. Ten headless
+Chrome fixture tests passed, covering live price refresh, cart quantity retention,
+quote confirmation/conflict, reload recovery, secure account screens, staff
+packing/refund, notification opt-in and mobile layout. Six CDK tests passed.
 
-October 5 pricing slice verification: 43 backend unit/HTTP tests, 18 real
-PostgreSQL integration scenarios and all three boot JARs passed. All 19 storefront
-tests, TypeScript and generated contract/type consistency checks passed. Refresh
-tests cover visible timing, focus/online resume, hidden pause, request sequencing
-and denial/cleanup behavior. A local fixture preview returned HTTP 200 and the
-BFF reflected a changed price from 20000 to 17000 paise. The SVG/PNG diagram was
-rendered and visually inspected. Browser control was unavailable; this does not
-constitute real Cognito/browser acceptance or a live staff/provider exercise.
+PostgreSQL tests cover fresh/repeated schema initialization, unrelated-schema
+preservation, restricted runtime permissions, staff scope plus database grants,
+concurrency, quote ownership/expiry/address changes, uncertain/late payment,
+webhook forgery/duplicates, refunds, parcels, label recovery/tracking, opt-out,
+variants and prepacked kit stock/quote invalidation. Provider HTTP tests use
+loopback fixtures; browser tests mock auth/BFF/provider SDK responses. Mobile and
+staff screenshots and the lifecycle SVG/PNG were visually inspected. These are not live provider results.
 
-Release gates still open:
+## Remaining external work
 
-- Payment, Amazon Shipping, refund and email/SMS consumers, reservation expiry,
-  reconciliation, provider contracts and complete customer lifecycle tests.
-- Additional schema initialization/isolation and runtime privilege acceptance,
-  authentication/browser acceptance, production database grants,
-  TLS/edge/Cognito configuration and deployment actions.
-- CDK dependency audit currently reports a high advisory in bundled
-  brace-expansion; npm audit fix cannot repair the bundled dependency.
-  Resolve the advisory before releasing the infrastructure toolchain.
-- Account/provider configuration and alert subscriptions. No AWS deployment or
-  customer notifications have been executed. Checkout remains disabled.
-- Production pricing scope/permission grants and staff MFA; full browser/device
-  acceptance, generated transport SDKs and parent-product variant grouping.
+Follow [provider signup and Secrets Manager setup](provider-setup.md) in parallel.
+Razorpay/Amazon account approval, SES/SNS sandbox exits and India DLT approvals,
+Cognito hosted login/staff scopes/MFA, real credentials, approved checkout policies,
+RDS role grants/verified TLS, HTTPS/domain/web secret injection, alarms and recovery
+sign-off are required before enabling checkout or starting services.
 
-Pricing is deliberately limited to percentage, fixed amount, bundle price and
-buy-X-get-Y rules for one SKU, with non-overlapping schedules and no stacking.
-See [pricing rules](pricing-rules.md), [SVG](../architecture/pricing-rules.svg)
-and [.agents guidance](../../.agents/pricing-rules.md).
+Real Cognito signup/login, provider sandbox capture/refund/reconciliation, approved
+Amazon label printing and physical pickup/delivery/RTO, real notification delivery,
+production secret rotation and deployment acceptance remain unverified. Cognito
+refresh-token rotation/account linking, native mobile apps, media processing and
+advanced cross-SKU cart promotions are outside this implemented scope. Amazon
+rates requiring additional inputs/services are held for operator review.
 
-Class names describe responsibility; CommerceSchemaInitializer creates and
-versions the fresh schema. Flyway's standard db/migration folder is schema
-versioning terminology, not an old-application import.
+Dependency release review remains open: the storefront install reported 28
+advisories (including four critical); CDK has a bundled brace-expansion advisory.
+Do not interpret passing tests as dependency-security clearance. No AWS deployment,
+live payment, existing database modification or real customer send was performed.
 
-See [restart checkpoint](restart-checkpoint.md) for the recovered working state,
-repeatable local commands and the next implementation slices.
+See [lifecycle/runbook](commerce-lifecycle.md), [pricing rules](pricing-rules.md),
+[lifecycle SVG](../architecture/commerce-lifecycle.svg) and
+[agent guidance](../../.agents/commerce-lifecycle.md).

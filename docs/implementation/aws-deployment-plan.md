@@ -1,6 +1,12 @@
 # Wellisha AWS deployment plan
 
-Status: proposed deployment mechanism, October 4, 2026. Infrastructure, pipeline and application code are not implemented or deployed. Backend: Kotlin/Spring Boot; UI: TypeScript/Next.js; shipping: Amazon Shipping with Wellisha packing.
+Status: CDK foundation, optional validation pipeline and commerce applications are
+implemented locally; AWS deployment has not been performed. Backend:
+`wellisha-services` Kotlin/Spring Boot; UI: TypeScript/Next.js; Amazon Shipping
+follows Wellisha packing. All services default to zero tasks and checkout disabled.
+Follow [provider setup](provider-setup.md) for signup, Secrets Manager inventory,
+nonsecret task settings and the parallel owner configuration workstream. See
+[execution status](execution-status.md) for tested scope and external release gates.
 
 ## Tooling decision
 
@@ -81,4 +87,3 @@ Extend P02 with container/build preparation and P03 with the migration executabl
 Before live deployment confirm account IDs, region, domain/DNS, GitHub connection, capacity/cost limits, provider sandbox/live credentials and release owner. Verify no public DB access, separate task roles/services, failed-migration stop, immutable promotion, unhealthy-service rollback, Secrets Manager rotation, queue recovery, restore and logs redaction.
 
 Existing 78 planned application/Shipping cases remain. Add deployment acceptance evidence for pipeline serialization, migration task failure, artifact promotion and rollback; mark passed only after real execution.
-

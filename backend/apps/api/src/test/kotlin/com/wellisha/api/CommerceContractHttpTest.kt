@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import java.time.Instant
 
-@WebMvcTest(CommerceController::class, CatalogCartController::class, properties=["CHECKOUT_ENABLED=false"])
+@WebMvcTest(CommerceController::class, CatalogCartController::class, CheckoutController::class, PaymentController::class, StaffRefundController::class, StaffPackingController::class, NotificationPreferenceController::class, ShipmentDocumentController::class, StaffOperationsController::class, BundleController::class, properties=["CHECKOUT_ENABLED=false"])
 @Import(CognitoApiSecurityConfiguration::class, ApiExceptionHandler::class, RequestLoggingFilter::class, RequestBodyLimitFilter::class)
 class CommerceContractHttpTest {
     @Autowired lateinit var mvc: MockMvc
@@ -28,6 +28,16 @@ class CommerceContractHttpTest {
     @MockitoBean lateinit var commerce: OrderAndShipmentRepository
     @MockitoBean lateinit var catalog: CatalogPricingRepository
     @MockitoBean lateinit var carts: CartRepository
+    @MockitoBean lateinit var checkout: CheckoutRepository
+    @MockitoBean lateinit var payments: PaymentRepository
+    @MockitoBean lateinit var secrets: ProviderSecrets
+    @MockitoBean lateinit var refunds: RefundRepository
+    @MockitoBean lateinit var packing: PackingRepository
+    @MockitoBean lateinit var bundles: BundleRepository
+    @MockitoBean lateinit var notifications: NotificationRepository
+    @MockitoBean lateinit var contacts: CognitoContactLookup
+    @MockitoBean lateinit var shipping: ShippingRepository
+    @MockitoBean lateinit var jdbc: org.springframework.jdbc.core.simple.JdbcClient
     @MockitoBean lateinit var decoder: JwtDecoder
     private val contract: JsonNode by lazy {
         mapper.readTree(javaClass.getResourceAsStream("/openapi.json")!!)
@@ -37,7 +47,7 @@ class CommerceContractHttpTest {
     private val address = Address("a1", input.name, input.phone, input.addressLine, input.city, input.state, input.pincode, 1)
 
     @Test fun contractCoversExactlyTheImplementedControllerRoutes() {
-        val actual = mappings.handlerMethods.filterValues { it.beanType in setOf(CommerceController::class.java,CatalogCartController::class.java) }
+        val actual = mappings.handlerMethods.filterValues { it.beanType in setOf(CommerceController::class.java,CatalogCartController::class.java,CheckoutController::class.java,PaymentController::class.java,StaffRefundController::class.java,StaffPackingController::class.java,NotificationPreferenceController::class.java,ShipmentDocumentController::class.java,StaffOperationsController::class.java,BundleController::class.java) }
             .flatMap { (mapping, _) -> mapping.patternValues.flatMap { path -> mapping.methodsCondition.methods.map { "${it.name.lowercase()} $path" } } }.toSet()
         val declared = contract["paths"].fields().asSequence().flatMap { (path, methods) -> methods.fieldNames().asSequence().map { "$it $path" } }.toSet()
         assertEquals(actual, declared)
@@ -86,7 +96,7 @@ class CommerceContractHttpTest {
         checkResponse(get("/v1/me"), "/v1/me", "get", 401, authenticated=false)
         checkResponse(post("/v1/me/addresses").contentType("application/json").content("{}"), "/v1/me/addresses", "post", 400)
         checkResponse(post("/v1/orders").header("Idempotency-Key", "test-order-request-01").contentType("application/json")
-            .content(mapper.writeValueAsBytes(CreateOrderInput("a1", listOf(OrderLineInput("p1", 1))))), "/v1/orders", "post", 503, empty=true)
+            .content(mapper.writeValueAsBytes(AcceptQuoteInput("q1"))), "/v1/orders", "post", 503, empty=true)
         verifyNoInteractions(customers, commerce)
     }
 

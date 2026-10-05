@@ -11,12 +11,10 @@ import org.slf4j.LoggerFactory
 import java.util.UUID
 
 @Component
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name=["WORKER_MODE"],havingValue="outbox-relay")
 class SqsOutboxPublisher(private val jdbc: JdbcClient,private val env: Environment,private val mapper: ObjectMapper) {
     private val log=LoggerFactory.getLogger(javaClass)
     private val sqs=SqsClient.create()
-    init { require(env.getRequiredProperty("WORKER_MODE")=="outbox-relay") {
-        "Only outbox-relay is implemented; external adapter consumers are not ready"
-    } }
     private data class Event(val id:String,val aggregate:String,val type:String,val payload:String)
     @Scheduled(fixedDelay=1000)
     fun dispatch() {
@@ -37,6 +35,8 @@ class SqsOutboxPublisher(private val jdbc: JdbcClient,private val env: Environme
                     val queue=when(event.type) {
                         "PaymentSetupRequested" -> env.getRequiredProperty("QUEUE_URL_PAYMENT")
                         "PackagePackedReady" -> env.getRequiredProperty("QUEUE_URL_SHIPPING")
+                        "ShipmentCancellationRequested" -> env.getRequiredProperty("QUEUE_URL_SHIPPING")
+                        "RefundRequested" -> env.getRequiredProperty("QUEUE_URL_REFUND")
                         "EmailRequested" -> env.getRequiredProperty("QUEUE_URL_EMAIL")
                         "SmsRequested" -> env.getRequiredProperty("QUEUE_URL_SMS")
                         else -> throw IllegalStateException("No queue route for event type")

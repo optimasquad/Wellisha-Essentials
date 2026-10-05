@@ -65,7 +65,13 @@ class CatalogPricingRepository(private val jdbc: JdbcClient, private val mapper:
         val at=databaseTime()
         val p=jdbc.sql("$productSql WHERE COALESCE(p.slug,p.id)=:slug AND p.active=true")
             .param("slug",slug).param("at",java.sql.Timestamp.from(at)).query { rs,_ -> readProduct(rs) }.optional().orElseThrow { MissingResource() }
-        return ProductDetailView(p,at,refreshAfter(at))
+        val siblings=jdbc.sql("""$productSql WHERE p.active=true AND p.family_id=(SELECT family_id FROM commerce.product WHERE id=:id) ORDER BY p.id LIMIT 100""")
+            .param("id",p.id).param("at",java.sql.Timestamp.from(at)).query { rs,_ ->
+                val variant=readProduct(rs);ProductVariantView(variant.id,variant.slug,rs.getString("variant_label").ifBlank { variant.name },variant.priceMinor,variant.available)
+            }.list()
+        val contents=jdbc.sql("SELECT c.component_product_id,p.name,c.quantity FROM commerce.product_bundle_component c JOIN commerce.product p ON p.id=c.component_product_id WHERE c.bundle_product_id=:id ORDER BY c.component_product_id")
+            .param("id",p.id).query { rs,_ -> BundleComponentView(rs.getString(1),rs.getString(2),rs.getInt(3)) }.list()
+        return ProductDetailView(p,at,refreshAfter(at),siblings,contents)
     }
     fun mayPrice(issuer: String, subject: String): Boolean = jdbc.sql("""SELECT count(*) FROM commerce.staff_permission
         WHERE issuer=:issuer AND subject=:subject AND permission='catalog.pricing.write'""")

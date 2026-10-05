@@ -12,7 +12,7 @@ import org.springframework.core.env.Environment
 
 @RestController
 @RequestMapping("/v1")
-class CommerceController(private val customers: CustomerAddressRepository,private val commerce: OrderAndShipmentRepository,private val env: Environment) {
+class CommerceController(private val customers: CustomerAddressRepository,private val commerce: OrderAndShipmentRepository,private val env: Environment,private val checkout: CheckoutRepository) {
     private fun owner(jwt: Jwt): String = customers.resolve(jwt.issuer.toString(),jwt.subject).id
     @GetMapping("/me") fun me(@AuthenticationPrincipal jwt: Jwt) = Customer(owner(jwt))
     @GetMapping("/me/addresses") fun addresses(@AuthenticationPrincipal jwt: Jwt) = customers.addresses(owner(jwt))
@@ -24,11 +24,11 @@ class CommerceController(private val customers: CustomerAddressRepository,privat
     @DeleteMapping("/me/addresses/{id}") @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteAddress(@AuthenticationPrincipal jwt: Jwt,@PathVariable id: String) = customers.deleteAddress(owner(jwt),id)
     @PostMapping("/orders") fun createOrder(@AuthenticationPrincipal jwt: Jwt,
-        @RequestHeader("Idempotency-Key") key: String,@Valid @RequestBody input: CreateOrderInput): ResponseEntity<OrderView> {
+        @RequestHeader("Idempotency-Key") key: String,@Valid @RequestBody input: AcceptQuoteInput): ResponseEntity<OrderView> {
         if(!env.getProperty("CHECKOUT_ENABLED",Boolean::class.java,false)) {
             return ResponseEntity.status(503).build()
         }
-        val order=commerce.createOrder(owner(jwt),key,input)
+        val order=checkout.accept(owner(jwt),key,input.quoteId)
         return ResponseEntity.accepted().location(URI.create("/v1/orders/${order.id}")).body(order)
     }
     @GetMapping("/orders") fun orders(@AuthenticationPrincipal jwt: Jwt) = commerce.orders(owner(jwt))

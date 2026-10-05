@@ -200,6 +200,7 @@ export function Header({ commerceEnabled = false }: { commerceEnabled?: boolean 
                       My Orders
                     </Link>
                     {isAdmin && (
+                      commerceEnabled ? <Link href="/staff/orders" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">Staff operations</Link> :
                       <Link
                         href="/admin"
                         className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50"
@@ -208,6 +209,7 @@ export function Header({ commerceEnabled = false }: { commerceEnabled?: boolean 
                         Admin Dashboard
                       </Link>
                     )}
+                    {commerceEnabled && <Link href="/account/notification-settings" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">Notification settings</Link>}
                     <button
                       onClick={() => signOut({ callbackUrl: "/" })}
                       className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"

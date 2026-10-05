@@ -2,9 +2,10 @@
   "name": "wellisha-storefront",
   "private": true,
   "scripts": {
-    "contracts:generate": "node scripts/generate-commerce-types.mjs",
-    "contracts:check": "node scripts/generate-commerce-types.mjs --check",
+    "contracts:generate": "node scripts/generate-commerce-types.mjs && node scripts/generate-commerce-client.mjs",
+    "contracts:check": "node scripts/generate-commerce-types.mjs --check && node scripts/generate-commerce-client.mjs --check",
     "test": "node --import tsx --test tests/*.test.ts",
+    "test:browser": "playwright test",
     "typecheck": "tsc --noEmit",
     "dev": "next dev",
     "build": "next build",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@next/swc-wasm-nodejs": "13.5.1",
+    "@playwright/test": "1.63.0",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",

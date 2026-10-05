@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useLiveCommerce } from "@/hooks/use-live-commerce";
-import { isProductDetail } from "@/lib/catalog-data";
+import { isProductDetail,formatMinor } from "@/lib/catalog-data";
 import { ProductPrice } from "./catalog";
 
 export function CommerceProductDetail({ slug }: { slug: string }) {
@@ -36,6 +36,8 @@ export function CommerceProductDetail({ slug }: { slug: string }) {
     {!product && live.loading && <p role="status" className="my-6">Loading product...</p>}
     {product && <div className="grid md:grid-cols-2 gap-10 mt-6"><div className="relative aspect-square rounded-2xl bg-rose-50 overflow-hidden"><Image src={product.image.startsWith("/") && !product.image.startsWith("//") ? product.image : "/products/wellisha-hero.jpg"} alt={product.name} fill className="object-cover" /></div>
       <div className="space-y-6"><h1 className="text-3xl font-bold">{product.name}</h1><p className="text-gray-600">{product.description}</p><ProductPrice product={product} />
+        {!!live.data?.variants.length && <nav aria-label="Choose a variant" className="flex flex-wrap gap-3">{live.data.variants.map(v=><Link key={v.id} href={'/products/'+encodeURIComponent(v.slug)} aria-current={v.id===product.id?'page':undefined} className="border rounded-lg p-3">{v.label} · {formatMinor(v.priceMinor)}{!v.available?' · Sold out':''}</Link>)}</nav>}
+        {!!live.data?.bundleContents.length && <div><h2 className="font-semibold">This prepacked kit contains</h2>{live.data.bundleContents.map(c=><p key={c.productId}>{c.quantity} × {c.name}</p>)}</div>}
         <label className="flex gap-4 items-center">Quantity<input type="number" min={1} max={100} value={quantity} onChange={e=>setQuantity(Math.min(100,Math.max(1,Number(e.target.value)||1)))} className="border rounded-lg p-3 w-24" /></label>
         <p className="text-sm text-gray-600">Bundle and free-item savings are calculated in your cart. Include free units in the quantity you add.</p>
         {status === "unauthenticated" ? <Link href={"/login?redirect="+encodeURIComponent("/products/"+slug)} className="inline-block rounded-full bg-purple-800 text-white px-6 py-3">Sign in to add to cart</Link> : <button disabled={status!=="authenticated" || saving || !product.available || !!live.error} onClick={() => void add()} className="rounded-full bg-purple-800 text-white px-6 py-3 disabled:opacity-40">{saving ? "Adding..." : product.available ? "Add to cart" : "Sold out"}</button>}

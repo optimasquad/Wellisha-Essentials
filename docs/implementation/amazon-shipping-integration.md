@@ -1,6 +1,10 @@
 # Amazon Shipping integration and architecture
 
-Status: selected by the user on October 4, 2026. Design updated; API implementation and commercial onboarding are pending. This supersedes the earlier MCF assumption.
+Status: selected October 4; rates/purchase, private document recovery, tracking
+polling and pre-pickup cancellation are implemented with durable attempts.
+Commercial onboarding, approved physical labels/pickup and sandbox acceptance
+remain pending. See [provider setup](provider-setup.md) and
+[execution status](execution-status.md). This supersedes the earlier MCF assumption.
 
 ## Ownership and order lifecycle
 

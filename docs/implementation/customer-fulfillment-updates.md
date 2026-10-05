@@ -1,6 +1,11 @@
 # Customer fulfillment visibility and notifications
 
-Status: required behavior added to the implementation plan; not implemented. “Message” is interpreted as the Wellisha website/mobile in-app inbox. WhatsApp is a separate channel requiring provider onboarding and customer consent.
+Status: saved web order/tracking/inbox, verified-contact opt-in SES/SNS delivery,
+packing and ordered tracking are implemented. See [execution status](execution-status.md)
+and [lifecycle](commerce-lifecycle.md). Genuine provider delivery, feedback ingestion,
+native mobile and WhatsApp remain external/future work. “Message” means the owned
+in-app inbox. Order summaries derive saved parcel allocations and do not call a
+provider from customer reads or show a partial delivery as fully delivered.
 
 ## Saved fulfillment details
 

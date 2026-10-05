@@ -144,7 +144,9 @@ class CatalogPricingPostgresTest {
         price(OfferKind.BUNDLE_PRICE,49900,3)
         val alice=customers.resolve(issuer,"alice").id
         val address=customers.createAddress(alice,AddressInput("Customer","9999999999","Road","Pune","MH","411001"))
-        val body=mapper.writeValueAsBytes(CreateOrderInput(address.id,listOf(OrderLineInput("p1",3))))
+        val quote=mvc.perform(post("/v1/checkout/quotes").with(auth()).contentType("application/json")
+            .content(mapper.writeValueAsBytes(CreateOrderInput(address.id,listOf(OrderLineInput("p1",3)))))).andExpect(status().isCreated).andReturn()
+        val body=mapper.writeValueAsBytes(AcceptQuoteInput(mapper.readTree(quote.response.contentAsString)["id"].asText()))
         val result=mvc.perform(post("/v1/orders").with(auth()).header("Idempotency-Key","bundle-order-test-01").contentType("application/json").content(body))
             .andExpect(status().isAccepted).andExpect(jsonPath("$.totalMinor").value(49900+4900)).andReturn()
         val id=mapper.readTree(result.response.contentAsString)["id"].asText()

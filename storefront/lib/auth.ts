@@ -33,9 +33,11 @@ declare module "next-auth/jwt" {
   }
 }
 
+const commerceMode = Boolean(process.env.COMMERCE_API_URL);
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  ...(commerceMode ? {} : { adapter: PrismaAdapter(prisma) }),
   providers: [
+    ...(commerceMode ? [] : [
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -69,11 +71,13 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
       allowDangerousEmailAccountLinking: false,
     }),
+    ]),
     ...(process.env.COGNITO_ISSUER && process.env.COGNITO_CLIENT_ID && process.env.COGNITO_CLIENT_SECRET
       ? [CognitoProvider({
           issuer: process.env.COGNITO_ISSUER,
           clientId: process.env.COGNITO_CLIENT_ID,
           clientSecret: process.env.COGNITO_CLIENT_SECRET,
+          authorization: { params: { scope: process.env.COGNITO_SCOPES ?? "openid email profile aws.cognito.signin.user.admin" } },
           checks: ["pkce", "state"],
         })] : []),
   ],
@@ -109,6 +113,10 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === "cognito") {
         token.cognitoAccessToken = account.access_token;
         token.cognitoExpiresAt = account.expires_at;
+      }
+      if (commerceMode) {
+        if (user) { token.id=user.id; token.role="CUSTOMER"; token.profileComplete=true; }
+        return token;
       }
       if (user) {
         token.id = user.id;

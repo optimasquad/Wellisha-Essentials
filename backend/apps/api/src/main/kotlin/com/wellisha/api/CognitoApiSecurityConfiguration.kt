@@ -36,10 +36,18 @@ class CognitoApiSecurityConfiguration {
             .authorizeHttpRequests {
                 it.requestMatchers("/actuator/health","/actuator/health/liveness","/actuator/health/readiness").permitAll()
                 it.requestMatchers(HttpMethod.GET,"/v1/products","/v1/products/*","/v1/categories").permitAll()
+                it.requestMatchers(HttpMethod.POST,"/v1/webhooks/razorpay").permitAll()
                 it.requestMatchers(HttpMethod.PATCH,"/v1/admin/products/*/pricing").hasAuthority("SCOPE_wellisha/pricing.write")
                 it.requestMatchers(HttpMethod.GET,"/v1/admin/products/*/pricing").hasAuthority("SCOPE_wellisha/pricing.write")
+                it.requestMatchers(HttpMethod.GET,"/v1/admin/products/*/bundle").hasAuthority("SCOPE_wellisha/catalog.write")
+                it.requestMatchers(HttpMethod.PATCH,"/v1/admin/products/*/bundle").hasAuthority("SCOPE_wellisha/catalog.write")
                 it.requestMatchers("/v1/admin/**").denyAll()
-                it.requestMatchers("/v1/staff/**").denyAll() // Enable only after server-owned permissions/MFA implementation.
+                it.requestMatchers(HttpMethod.POST,"/v1/staff/orders/*/refunds").hasAuthority("SCOPE_wellisha/refund.write")
+                it.requestMatchers(HttpMethod.POST,"/v1/staff/orders/*/packages","/v1/staff/packages/*/ready").hasAuthority("SCOPE_wellisha/packing.write")
+                it.requestMatchers(HttpMethod.GET,"/v1/staff/shipments/*/documents").hasAuthority("SCOPE_wellisha/packing.write")
+                it.requestMatchers(HttpMethod.GET,"/v1/staff/orders","/v1/staff/orders/*/operations").hasAuthority("SCOPE_wellisha/operations.read")
+                it.requestMatchers(HttpMethod.POST,"/v1/staff/shipments/*/cancel").hasAuthority("SCOPE_wellisha/shipping.cancel")
+                it.requestMatchers("/v1/staff/**").denyAll()
                 it.requestMatchers("/v1/**").authenticated()
                 it.anyRequest().denyAll()
             }

@@ -1,13 +1,14 @@
 # Commerce wire contract
 
 `openapi.json` describes the implemented HTTP foundation using
-[OpenAPI 3.0.3](https://spec.openapis.org/oas/v3.0.3.html). Quotes, payment,
-shipping intake and the remaining staff workflows remain in the code plan.
+[OpenAPI 3.0.3](https://spec.openapis.org/oas/v3.0.3.html). Version 0.3.0 includes
+quotes, owned payment details, signed webhook intake, staff packing/refund/cancel,
+private document links, preferences, variants and prepacked kit configuration.
 The contract does not enable checkout or imply provider acceptance. Version
 0.2.0 adds paged catalog/category/detail, owned carts and pricing configuration
 read/write operations. The product list changed from an array to a page envelope.
-Future work still includes parent-product variant grouping, quotes/providers,
-mixed-SKU offers and the complete staff console.
+Advanced cross-SKU cart promotions and broader staff administration remain outside
+this simple lifecycle scope; mixed-product bundles are stocked prepacked kits.
 
 Update the contract with each controller/DTO change. From `storefront/`, run:
 
@@ -18,9 +19,10 @@ npm test
 npm run typecheck
 ```
 
-Commit `storefront/lib/generated/commerce-types.ts` with the contract. The local
+Commit `storefront/lib/generated/commerce-types.ts` and `commerce-client.ts` with the contract. The local
 generator supports this contract's schema subset and rejects unsupported type
-constructs. It generates DTO types, not a transport client or runtime validators.
+constructs. It generates DTOs and a fetch transport with encoded paths, retry-key
+headers, no-store and safe status errors. It does not generate runtime validators.
 Keep runtime checks for untrusted JSON. Kotlin int64 fields map to TypeScript
 numbers; consumers must check safe integer ranges before arithmetic.
 

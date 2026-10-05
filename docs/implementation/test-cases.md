@@ -1,5 +1,12 @@
 # Wellisha test-case specification
 
+October 6 lifecycle coverage is recorded in [execution status](execution-status.md).
+`CheckoutLifecyclePostgresTest` adds quote/stock/capture/refund/parcel/notification,
+schema repeatability, restricted role, staff grants, variants and prepacked kits.
+`ProviderGatewayTest` checks real HTTP against loopback fixtures and no blind POST
+retry. `storefront/tests/browser/commerce.spec.ts` exercises headless Chrome using
+auth/BFF fixtures. These do not close real provider or Cognito acceptance gates.
+
 Status: 78 planned acceptance cases; a subset has executable coverage. See [execution status](execution-status.md) for verified results and open gates. Link each endpoint/business invariant to work package, test name, owner and CI evidence. Add cases for changed requirements and discovered bugs; coverage percentages alone do not prove completeness.
 
 October 5 resumed verification: all nine `CustomerOrderPostgresTest` scenarios

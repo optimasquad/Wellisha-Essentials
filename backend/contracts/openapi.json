@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Wellisha Commerce API",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Implemented commerce foundation. Cognito access tokens require the configured issuer/client_id; no legacy cookie authentication. JSON bodies are limited to 16384 bytes; compressed bodies are rejected. Catalog list returns a page envelope. Four simple non-stacking same-SKU offer types share one evaluator with owned carts and order lines. Percentage discounts round down per unit before multiplying quantity. Visible clients refetch within 15 seconds or sooner at schedule boundaries. Buy-X-get-Y quantities include free units. Cart totals are not checkout quotes. Pricing administration requires wellisha/pricing.write scope AND a server-owned catalog.pricing.write permission. Checkout remains disabled by default until provider/reservation/quote acceptance. TypeScript consumers reject unsafe integer money."
   },
   "security": [
@@ -428,8 +428,8 @@
     },
     "/v1/orders": {
       "post": {
-        "operationId": "createOrder",
-        "description": "DISABLED by default. Server calculates INR totals and snapshots owned address. Customer-scoped key replays the same order only for identical input; changed payload returns 409. Duplicate product IDs are invalid. Does not authorize fulfillment. Release requires reservation expiry and provider acceptance.",
+        "operationId": "acceptQuote",
+        "description": "Accept the owned, unexpired quote without repricing. Returns 409 on changed price/address/stock; create and review a fresh quote. CHECKOUT_ENABLED remains a deployment gate.",
         "responses": {
           "202": {
             "description": "Success",
@@ -519,7 +519,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateOrderInput"
+                "$ref": "#/components/schemas/AcceptQuoteInput"
               }
             }
           }
@@ -1324,6 +1324,948 @@
           }
         ]
       }
+    },
+    "/v1/checkout/quotes": {
+      "post": {
+        "operationId": "createCheckoutQuote",
+        "security": [
+          {
+            "cognitoAccess": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutQuote"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrderInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/checkout/quotes/{id}": {
+      "get": {
+        "operationId": "getCheckoutQuote",
+        "security": [
+          {
+            "cognitoAccess": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutQuote"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1/orders/{id}/payment": {
+      "get": {
+        "operationId": "getPaymentCheckout",
+        "security": [
+          {
+            "cognitoAccess": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentCheckout"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1/webhooks/razorpay": {
+      "post": {
+        "operationId": "receiveRazorpayWebhook",
+        "security": [],
+        "parameters": [
+          {
+            "name": "X-Razorpay-Event-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Razorpay-Signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Durably committed response"
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "description": "Raw signed Razorpay webhook envelope"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff/orders/{id}/refunds": {
+      "post": {
+        "operationId": "requestRefund",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/refund.write"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,100}$"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefundView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff/orders/{id}/packages": {
+      "post": {
+        "operationId": "createParcel",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/packing.write"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{16,100}$"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParcelInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff/packages/{id}/ready": {
+      "post": {
+        "operationId": "markParcelReady",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/packing.write"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadyParcelInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff/shipments/{id}/documents": {
+      "get": {
+        "operationId": "getShipmentDocument",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/packing.write"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShipmentDocumentLink"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1/me/notification-preferences": {
+      "get": {
+        "operationId": "getNotificationPreferences",
+        "security": [
+          {
+            "cognitoAccess": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferences"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateNotificationPreferences",
+        "security": [
+          {
+            "cognitoAccess": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferences"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationPreferenceInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/staff/orders/{id}/operations": {
+      "get": {
+        "operationId": "getStaffOrderOperations",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/operations.read"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffOrderOperations"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1/staff/orders": {
+      "get": {
+        "operationId": "listStaffOrders",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/operations.read"
+            ]
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrderView"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1/staff/shipments/{id}/cancel": {
+      "post": {
+        "operationId": "cancelShipment",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/shipping.cancel"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShipmentCancellationInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/products/{id}/bundle": {
+      "get": {
+        "operationId": "getBundleConfiguration",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/catalog.write"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BundleConfiguration"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "updateBundleConfiguration",
+        "security": [
+          {
+            "cognitoAccess": [
+              "wellisha/catalog.write"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Durably committed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BundleConfiguration"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "description": "Safe error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BundleInput"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1796,7 +2738,9 @@
         "required": [
           "product",
           "pricedAt",
-          "refreshAfterMs"
+          "refreshAfterMs",
+          "variants",
+          "bundleContents"
         ],
         "properties": {
           "product": {
@@ -1811,6 +2755,18 @@
             "format": "int64",
             "minimum": 1000,
             "maximum": 15000
+          },
+          "variants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductVariantView"
+            }
+          },
+          "bundleContents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BundleComponentView"
+            }
           }
         },
         "additionalProperties": false
@@ -2050,6 +3006,531 @@
             "maxItems": 10
           }
         },
+        "additionalProperties": false
+      },
+      "QuoteLine": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "basePriceMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "discountMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "priceVersion": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "productId",
+          "quantity",
+          "basePriceMinor",
+          "discountMinor",
+          "totalMinor",
+          "priceVersion"
+        ],
+        "additionalProperties": false
+      },
+      "CheckoutQuote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "addressId": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuoteLine"
+            }
+          },
+          "subtotalMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "shippingMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "totalMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "INR"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "addressId",
+          "items",
+          "subtotalMinor",
+          "shippingMinor",
+          "totalMinor",
+          "currency",
+          "expiresAt"
+        ],
+        "additionalProperties": false
+      },
+      "AcceptQuoteInput": {
+        "type": "object",
+        "properties": {
+          "quoteId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "quoteId"
+        ],
+        "additionalProperties": false
+      },
+      "PaymentCheckout": {
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "providerOrderId": {
+            "type": "string"
+          },
+          "keyId": {
+            "type": "string"
+          },
+          "amountMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "INR"
+            ]
+          }
+        },
+        "required": [
+          "orderId",
+          "providerOrderId",
+          "keyId",
+          "amountMinor",
+          "currency"
+        ],
+        "additionalProperties": false
+      },
+      "RefundInput": {
+        "type": "object",
+        "properties": {
+          "amountMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "amountMinor",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "RefundView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "amountMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1
+          },
+          "state": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "orderId",
+          "amountMinor",
+          "state"
+        ],
+        "additionalProperties": false
+      },
+      "ParcelInput": {
+        "type": "object",
+        "properties": {
+          "weightGrams": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 30000
+          },
+          "lengthMm": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "widthMm": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "heightMm": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineInput"
+            }
+          }
+        },
+        "required": [
+          "weightGrams",
+          "lengthMm",
+          "widthMm",
+          "heightMm",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "ParcelView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "orderId",
+          "state",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "ReadyParcelInput": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "ShipmentDocumentLink": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 60
+          }
+        },
+        "required": [
+          "url",
+          "expiresInSeconds"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationPreferences": {
+        "type": "object",
+        "properties": {
+          "emailEnabled": {
+            "type": "boolean"
+          },
+          "smsEnabled": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "emailEnabled",
+          "smsEnabled",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "NotificationPreferenceInput": {
+        "type": "object",
+        "properties": {
+          "emailEnabled": {
+            "type": "boolean"
+          },
+          "smsEnabled": {
+            "type": "boolean"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "emailEnabled",
+          "smsEnabled",
+          "version"
+        ],
+        "additionalProperties": false
+      },
+      "ProductVariantView": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "priceMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "label",
+          "priceMinor",
+          "available"
+        ],
+        "additionalProperties": false
+      },
+      "StaffOrderLine": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "allocatedQuantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "productId",
+          "name",
+          "quantity",
+          "totalMinor",
+          "allocatedQuantity"
+        ],
+        "additionalProperties": false
+      },
+      "StaffOrderOperations": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "$ref": "#/components/schemas/OrderView"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StaffOrderLine"
+            }
+          },
+          "parcels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParcelView"
+            }
+          },
+          "refunds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RefundView"
+            }
+          }
+        },
+        "required": [
+          "order",
+          "items",
+          "parcels",
+          "refunds"
+        ],
+        "additionalProperties": false
+      },
+      "ShipmentCancellationInput": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "version",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "BundleComponentView": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "productId",
+          "name",
+          "quantity"
+        ],
+        "additionalProperties": false
+      },
+      "BundleConfiguration": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineInput"
+            }
+          }
+        },
+        "required": [
+          "version",
+          "items"
+        ],
+        "additionalProperties": false
+      },
+      "BundleInput": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineInput"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "required": [
+          "version",
+          "items",
+          "reason"
+        ],
         "additionalProperties": false
       }
     },

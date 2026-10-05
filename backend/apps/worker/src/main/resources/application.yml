@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: wellisha-outbox-relay
+  main:
+    web-application-type: none
+logging:
+  structured:
+    format:
+      console: ecs
+

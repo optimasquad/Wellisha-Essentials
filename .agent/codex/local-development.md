@@ -5,17 +5,17 @@
 From the repository root in PowerShell:
 
 ```powershell
-Set-Location nextjs_space
+Set-Location storefront
 npm run dev -- --hostname 127.0.0.1 --port 3000
 ```
 
 Open `http://127.0.0.1:3000`. Choose a free port if 3000 is occupied. Keep the process running while using the app.
 
-If dependencies are absent, run `npm install` in `nextjs_space/`. The repository currently has no tracked npm lockfile in the inspected source listing, so dependency resolution may change over time.
+If dependencies are absent, run `npm install` in `storefront/`. The repository currently has no tracked npm lockfile in the inspected source listing, so dependency resolution may change over time.
 
 ## Environment
 
-Next.js loads local environment files from `nextjs_space/`. Do not include their values in documentation.
+Next.js loads local environment files from `storefront/`. Do not include their values in documentation.
 
 | Variable | Purpose |
 | --- | --- |
@@ -60,4 +60,4 @@ The configured seed command is `npx prisma db seed`, which invokes `scripts/safe
 - The layout uses `next/font/google`; an uncached font may need network access during compilation.
 - Google login requires provider configuration matching the local callback URL.
 - Checkout depends on database records and working Razorpay configuration.
-- When launched in the background during this session, server output goes to `nextjs_space/dev-server.log` and `nextjs_space/dev-server-error.log`.
+- When launched in the background during this session, server output goes to `storefront/dev-server.log` and `storefront/dev-server-error.log`.

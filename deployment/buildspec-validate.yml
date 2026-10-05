@@ -1,0 +1,24 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+      nodejs: 22
+    commands:
+      - chmod +x backend/gradlew
+      - npm ci --prefix infra/cdk --ignore-scripts
+  build:
+    commands:
+      - cd backend
+      - ./gradlew test :apps:api:integrationTest bootJar
+      - cd ../infra/cdk
+      - npm test
+      - npm audit --audit-level=high
+      - npm run synth
+      - cd ../..
+artifacts:
+  files:
+    - backend/**/build/reports/**/*
+    - infra/cdk/cdk.out/*.template.json
+  discard-paths: no
+

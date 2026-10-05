@@ -1,0 +1,330 @@
+{
+  "publishedDate": "2026-10-04",
+  "status": "Published for review; architecture remains a proposal",
+  "miro": {
+    "boardUrl": "https://miro.com/app/board/uXjVEer-YZg=/",
+    "reviewUrl": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793087",
+    "frames": [
+      {
+        "key": "architecture",
+        "id": "3458764685962793087",
+        "title": "01. High-Level AWS Architecture",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793087"
+      },
+      {
+        "key": "booking",
+        "id": "3458764685962793265",
+        "title": "A. Booking",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793265"
+      },
+      {
+        "key": "post",
+        "id": "3458764685962793341",
+        "title": "B. Post-Booking Operations",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793341"
+      },
+      {
+        "key": "02-login",
+        "id": "3458764685962793411",
+        "title": "02. Federated Login",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793411"
+      },
+      {
+        "key": "03-catalog",
+        "id": "3458764685962793507",
+        "title": "03. Catalog and Price Publication",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793507"
+      },
+      {
+        "key": "04-checkout",
+        "id": "3458764685962793588",
+        "title": "04. Checkout, Payment and Fulfillment",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793588"
+      },
+      {
+        "key": "05-cancellation",
+        "id": "3458764685962793711",
+        "title": "05. Agent Cancellation and Refund",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793711"
+      },
+      {
+        "key": "06-notifications",
+        "id": "3458764685962793844",
+        "title": "06. Asynchronous Email and SMS",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962793844"
+      },
+      {
+        "key": "07-tracking",
+        "id": "3458764685962839954",
+        "title": "07. Customer Delivery Tracking",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962839954"
+      },
+      {
+        "key": "10-media",
+        "id": "3458764685962840063",
+        "title": "10. Product Media Publication",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685962840063"
+      },
+      {
+        "id": "3458764685945134477",
+        "type": "frame",
+        "title": "11. Failure Handling and Security",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685945134477"
+      },
+      {
+        "id": "3458764685945134478",
+        "type": "frame",
+        "title": "12. Decisions and Release Gates",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685945134478"
+      },
+      {
+        "key": "13-stack",
+        "id": "3458764685968990781",
+        "title": "13. Kotlin Backend and PostgreSQL Flexibility",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685968990781"
+      },
+      {
+        "key": "14-storefront",
+        "title": "14. UI Wireframes - Collection and Product",
+        "id": "3458764685970316408",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685970316408"
+      },
+      {
+        "key": "15-checkout",
+        "title": "15. UI Wireframes - Cart and Checkout",
+        "id": "3458764685970316487",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685970316487"
+      },
+      {
+        "key": "16-customer",
+        "title": "16. UI Wireframes - Tracking and Support",
+        "id": "3458764685970316561",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685970316561"
+      },
+      {
+        "key": "17-staff",
+        "title": "17. UI Wireframes - Staff Cancellation and Refund",
+        "id": "3458764685970316631",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685970316631"
+      },
+      {
+        "key": "18-ecs-async",
+        "title": "18. ECS Services, Cache and Async Responses",
+        "id": "3458764685970424616",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685970424616"
+      },
+      {
+        "key": "19-amazon-shipping",
+        "id": "3458764685971754088",
+        "title": "19. Amazon Shipping - Store Pickup Integration",
+        "type": "frame",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685971754088"
+      }
+    ],
+    "archivedFrames": [
+      {
+        "id": "3458764685930374580",
+        "type": "frame",
+        "title": "A. Booking",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930374580"
+      },
+      {
+        "id": "3458764685930374581",
+        "type": "frame",
+        "title": "B. Post-Booking Operations",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930374581"
+      },
+      {
+        "id": "3458764685930407625",
+        "type": "frame",
+        "title": "02. Federated Login",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407625"
+      },
+      {
+        "id": "3458764685930407626",
+        "type": "frame",
+        "title": "03. Catalog and Price Publication",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407626"
+      },
+      {
+        "id": "3458764685930407627",
+        "type": "frame",
+        "title": "04. Checkout, Payment and Fulfillment",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407627"
+      },
+      {
+        "id": "3458764685930407628",
+        "type": "frame",
+        "title": "05. Agent Cancellation and Refund",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407628"
+      },
+      {
+        "id": "3458764685930407629",
+        "type": "frame",
+        "title": "06. Asynchronous Email and SMS",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407629"
+      },
+      {
+        "id": "3458764685930407630",
+        "type": "frame",
+        "title": "07. Customer Delivery Tracking",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407630"
+      },
+      {
+        "id": "3458764685930407631",
+        "type": "frame",
+        "title": "10. Product Media Publication",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407631"
+      },
+      {
+        "id": "3458764685930407632",
+        "type": "frame",
+        "title": "01. Shared AWS Architecture",
+        "url": "https://miro.com/app/board/uXjVEer-YZg=/?moveToWidget=3458764685930407632"
+      }
+    ],
+    "archiveX": 20000,
+    "nativeLayouts": 10,
+    "reviewFrames": 3,
+    "boxFontSize": 33,
+    "titleFontSize": 67,
+    "sequenceRowSpacing": 192,
+    "activeReadItems": 776,
+    "oldDiagramContainers": "Archived with superseded parent frames; API cannot delete or move these containers individually.",
+    "wireframeFrames": 4,
+    "deploymentFrames": 1,
+    "totalActiveFrames": 19
+  },
+  "confluence": {
+    "cloudId": "51c30519-95c7-471a-9d7d-4225f15e3e2d",
+    "contentId": "65927",
+    "url": "https://wellisha-team.atlassian.net/wiki/spaces/~712020a05862447af14967a08c13aaed292476/pages/65927/Architecture+Design+-+Wellisha+Essentials+Private+Limited",
+    "type": "live_doc",
+    "snapshotToken": "d1:654",
+    "originalRequirementsAndWhiteboardPreserved": true,
+    "allNewFrameLinksVerified": true
+  },
+  "verification": {
+    "miro": {
+      "outside": [],
+      "collisions": [],
+      "nodeOverlaps": [],
+      "counts": {
+        "frames": 12,
+        "texts": 163,
+        "labelledShapes": 94
+      },
+      "diagramCount": 0
+    },
+    "confluence": {
+      "allNewFrameLinks": true,
+      "originalContentPreserved": true
+    },
+    "localPreviews": "All ten rendered; architecture, booking and checkout inspected visually. Four new UI wireframe previews rendered and inspected visually; ECS preview rendered (attached native Miro connectors are present on the board).",
+    "stackUpdate": {
+      "miroReadBack": true,
+      "confluenceReadBack": true,
+      "layoutIssues": [],
+      "implementationPending": true
+    },
+    "implementationPlan": {
+      "miroReadBack": true,
+      "confluenceReadBack": true,
+      "wireframeLayoutIssues": [],
+      "plannedTestCases": 78,
+      "testsImplemented": false,
+      "implementationPending": true
+    }
+  },
+  "attachments": {
+    "drawio": "Not uploaded: Confluence attachment endpoint returned HTTP 401 Media token authentication error. Local source remains docs/architecture/wellisha-aws.drawio."
+  },
+  "updateInstructions": "Read current Miro objects and current Confluence snapshot before edits. Active frame IDs above and miro-repair/live.canvas.xml identify the clean review layouts. Update these objects in place; do not recreate them or edit archived frames. Shipping updates are read back in miro-repair/shipping-updated.canvas.xml and implementation/wireframes/19-amazon-shipping.canvas.xml; use those live IDs for Shipping edits.",
+  "backendDecision": {
+    "language": "Kotlin",
+    "framework": "Spring Boot",
+    "database": "PostgreSQL",
+    "status": "Confirmed by user; implementation pending",
+    "proposedRuntime": "JVM 21 / Amazon Corretto 21",
+    "flexibility": [
+      "Typed relational core",
+      "Validated versioned JSONB extensions",
+      "Flyway expand-and-contract migrations",
+      "Module-owned repositories and parameterized queries"
+    ]
+  },
+  "implementationPlan": {
+    "path": "docs/implementation/code-plan.md",
+    "testCases": "docs/implementation/test-cases.md",
+    "wireframeCanvas": "docs/implementation/wireframes/live.canvas.xml",
+    "ecsServices": [
+      "web",
+      "api",
+      "payment-worker",
+      "fulfillment-worker",
+      "refund-worker",
+      "notification-worker",
+      "catalog-media-worker",
+      "outbox-relay"
+    ],
+    "cache": [
+      "CloudFront assets/public media",
+      "Valkey public catalog"
+    ],
+    "asyncAcceptance": "HTTP 202 after durable PostgreSQL commit; provider preparation, verified payment and fulfillment have explicit states"
+  },
+  "shippingDecision": {
+    "provider": "Amazon Shipping India",
+    "inventoryAndPacking": "Wellisha store",
+    "api": "Shipping API v2",
+    "bookingGate": "Verified payment plus staff packed-ready",
+    "integrationDocument": "docs/implementation/amazon-shipping-integration.md",
+    "onboardingPending": true,
+    "implementationPending": true,
+    "miroReadBack": true,
+    "confluenceReadBack": true,
+    "layoutChecks": {
+      "outside": [],
+      "overlaps": []
+    }
+  },
+  "deploymentPlan": {
+    "path": "docs/implementation/aws-deployment-plan.md",
+    "status": "Proposed; implementation and provisioning pending",
+    "infrastructure": "AWS CDK v2 / TypeScript / CloudFormation",
+    "pipeline": "AWS CodePipeline / CodeBuild",
+    "source": "GitHub via CodeConnections",
+    "registry": "ECR immutable digests",
+    "runtime": "ECS Fargate",
+    "migration": "Single controlled Fargate task before rollout",
+    "confluenceReadBack": true
+  },
+  "customerFulfillmentUpdates": {
+    "document": "docs/implementation/customer-fulfillment-updates.md",
+    "channels": [
+      "SMS",
+      "email",
+      "in-app inbox"
+    ],
+    "authenticatedOrderRetrieval": true,
+    "asyncOutboxAndSQS": true,
+    "status": "Required; implementation pending",
+    "confluenceReadBack": true
+  }
+}

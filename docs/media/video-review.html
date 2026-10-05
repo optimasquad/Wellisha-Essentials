@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Video Inspection</title>
+<style>body{font:18px Arial;margin:30px;color:#202b37}h1{font-size:26px}.frames{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}canvas{width:100%;height:auto;background:#eee}figure{margin:0}figcaption{padding:8px 0}#source{position:absolute;width:1px;height:1px;opacity:0}</style></head>
+<body><h1>Wellisha - Supplied Video Inspection</h1><p id="status">Loading local MP4...</p><div class="frames" id="frames"></div>
+<video id="source" muted playsinline preload="auto" src="../../storefront/public/media/videos/wellisha-brand-original-v1.mp4"></video>
+<script>
+const video = document.getElementById('source');
+const status = document.getElementById('status');
+video.addEventListener('error', () => { status.textContent = 'Video decode failed: ' + (video.error?.message || video.error?.code); });
+video.addEventListener('loadeddata', async () => {
+  status.textContent = `${video.videoWidth} x ${video.videoHeight}; ${video.duration.toFixed(2)} seconds; decoded by browser`;
+  for (const second of [2, 20, 40, 60]) {
+    await new Promise(resolve => { video.addEventListener('seeked', resolve, { once: true }); video.currentTime = second; });
+    const figure = document.createElement('figure'); const canvas = document.createElement('canvas');
+    canvas.width = 720; canvas.height = 405; canvas.getContext('2d').drawImage(video, 0, 0, 720, 405);
+    const caption = document.createElement('figcaption'); caption.textContent = `Frame at ${second}s`;
+    figure.append(canvas, caption); document.getElementById('frames').append(figure);
+  }
+  status.textContent += '; four sample frames captured';
+}, { once: true });
+</script></body></html>

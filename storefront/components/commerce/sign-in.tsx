@@ -1,0 +1,6 @@
+"use client";
+import {useEffect,useState} from 'react';import {getProviders,signIn} from 'next-auth/react';import {useSearchParams} from 'next/navigation';
+export function CommerceSignIn({signup=false}:{signup?:boolean}){const params=useSearchParams();const requested=params?.get('redirect')??params?.get('callbackUrl')??'/';const redirect=requested.startsWith('/')&&!requested.startsWith('//')&&!requested.includes('\\')?requested:'/';const [ready,setReady]=useState<boolean|null>(null);
+ useEffect(()=>{let active=true;void getProviders().then(v=>{if(active)setReady(!!v?.cognito);}).catch(()=>{if(active)setReady(false);});return()=>{active=false;};},[]);
+ return <section className="max-w-md mx-auto px-4 py-20 space-y-6"><h1 className="text-3xl font-bold">{signup?'Create your Wellisha account':'Welcome to Wellisha'}</h1><p>Continue to secure sign-in to create an account, verify your contact details or reset your password.</p><button disabled={!ready} onClick={()=>void signIn('cognito',{callbackUrl:redirect})} className="rounded-full bg-purple-800 text-white px-6 py-3 disabled:opacity-40">Continue to secure sign-in</button>{ready===null&&<p role="status">Loading sign-in...</p>}{ready===false&&<p role="alert">Account sign-in is being configured. Please try again later.</p>}</section>;
+}

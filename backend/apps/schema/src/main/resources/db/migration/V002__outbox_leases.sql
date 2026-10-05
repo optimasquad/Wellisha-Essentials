@@ -1,0 +1,3 @@
+ALTER TABLE outbox ADD COLUMN lease_until TIMESTAMPTZ;
+ALTER TABLE outbox ADD COLUMN lease_token TEXT;
+

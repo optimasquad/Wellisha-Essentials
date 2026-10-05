@@ -13,6 +13,10 @@ The original storefront notes describe code inspected on October 3, 2026. For th
 
 ## Guidance for Codex
 
+Pricing and offer guidance is also recorded in
+[.agents/pricing-rules.md](../../.agents/pricing-rules.md), with API rules,
+worked examples and an SVG diagram linked from that guide.
+
 - Run application commands from `storefront/`.
 - Read the relevant page, component, API handler, and Prisma model before changing a workflow.
 - Use the existing `@/` import alias, shared Prisma instance, NextAuth configuration, and UI components.

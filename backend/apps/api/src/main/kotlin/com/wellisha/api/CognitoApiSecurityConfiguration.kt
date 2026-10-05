@@ -35,7 +35,10 @@ class CognitoApiSecurityConfiguration {
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers("/actuator/health","/actuator/health/liveness","/actuator/health/readiness").permitAll()
-                it.requestMatchers(HttpMethod.GET,"/v1/products").permitAll()
+                it.requestMatchers(HttpMethod.GET,"/v1/products","/v1/products/*","/v1/categories").permitAll()
+                it.requestMatchers(HttpMethod.PATCH,"/v1/admin/products/*/pricing").hasAuthority("SCOPE_wellisha/pricing.write")
+                it.requestMatchers(HttpMethod.GET,"/v1/admin/products/*/pricing").hasAuthority("SCOPE_wellisha/pricing.write")
+                it.requestMatchers("/v1/admin/**").denyAll()
                 it.requestMatchers("/v1/staff/**").denyAll() // Enable only after server-owned permissions/MFA implementation.
                 it.requestMatchers("/v1/**").authenticated()
                 it.anyRequest().denyAll()
@@ -44,4 +47,3 @@ class CognitoApiSecurityConfiguration {
         return http.build()
     }
 }
-

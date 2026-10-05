@@ -4,7 +4,7 @@ import { readCommerceBody, RequestBodyError } from "@/lib/request-body";
 import { sameOrigin } from "@/lib/request-security";
 
 export const dynamic = "force-dynamic";
-const allowed = /^(me(?:\/addresses(?:\/[A-Za-z0-9_-]{1,100})?|\/notifications(?:\/[A-Za-z0-9_-]{1,100}\/read)?)?|orders(?:\/[A-Za-z0-9_-]{1,100}(?:\/tracking)?)?)$/;
+const allowed = /^(me(?:\/addresses(?:\/[A-Za-z0-9_-]{1,100})?|\/notifications(?:\/[A-Za-z0-9_-]{1,100}\/read)?)?|orders(?:\/[A-Za-z0-9_-]{1,100}(?:\/tracking)?)?|cart(?:\/items(?:\/[A-Za-z0-9_-]{1,100})?)?)$/;
 async function proxy(request: NextRequest, { params }: { params: { path: string[] } }) {
   const path = params.path.join("/");
   if (!allowed.test(path)) return NextResponse.json({ error: "Not found" }, { status: 404 });

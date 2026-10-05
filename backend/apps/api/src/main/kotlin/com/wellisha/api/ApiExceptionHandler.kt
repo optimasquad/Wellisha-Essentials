@@ -21,6 +21,7 @@ class ApiExceptionHandler {
     private fun error(status: Int,code: String) = ResponseEntity.status(status)
         .header("Cache-Control","no-store").body(mapOf("code" to code,"correlationId" to (MDC.get("correlationId") ?: UUID.randomUUID().toString())))
     @ExceptionHandler(MissingResource::class) fun missing() = error(404,"RESOURCE_NOT_FOUND")
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException::class) fun denied() = error(403,"ACCESS_DENIED")
     @ExceptionHandler(StateConflict::class,DataIntegrityViolationException::class) fun conflict() = error(409,"STATE_CONFLICT")
     @ExceptionHandler(IllegalArgumentException::class,MethodArgumentNotValidException::class,
         HttpMessageNotReadableException::class,MissingRequestHeaderException::class)

@@ -87,6 +87,17 @@ Testcontainers databases only; no application database or AWS resource was chang
 
 ## Next implementation slices
 
+The subsequent pricing/catalog/cart slice is complete for the documented first
+scope: four simple same-SKU scheduled offer types, configuration read/write API
+with both scope and server-owned permission, price versions/audit, bounded paged
+catalog and detail/category reads, owned cart CRUD and automatic commerce-mode
+UI refresh. Current verification is 43 backend unit/HTTP tests, 18 PostgreSQL
+scenarios, 19 storefront tests, TypeScript and all three backend boot JARs passed.
+The local fixture BFF reflected a changed price; refresh scheduling has executable
+tests. Browser control was unavailable, so real Cognito/browser acceptance remains
+open. See [pricing policy](pricing-rules.md), [diagram](../architecture/pricing-rules.svg)
+and [.agents guidance](../../.agents/pricing-rules.md) before extending offers.
+
 October 5 resumed work added `backend/contracts/openapi.json` and generated
 storefront DTO types. All 12 currently implemented controller operations are
 documented with authentication, address versions, list limits, body limits,
@@ -100,8 +111,9 @@ Transport client generation, catalog/cart and browser acceptance remain open.
 
 1. P03/P04: extend the now-passing PostgreSQL suite with repeat initialization,
    unrelated-schema isolation and restricted runtime privilege acceptance.
-2. P05/P12: extend the shared OpenAPI foundation with catalog/cart operations,
-   generate transport clients and connect website journeys to the commerce API.
+2. P05/P12: complete parent-product/variant grouping and generated transport SDKs;
+   verify genuine browser/Cognito shopping and staff pricing journeys. Initial
+   paged catalog/cart APIs and automatic pricing refresh are now implemented.
 3. P06/P08: add explicit stock reservation expiry and retry/reconciliation
    behavior before connecting payment processing.
 4. P07/P09/P11: implement signed payment intake, Amazon Shipping packing and

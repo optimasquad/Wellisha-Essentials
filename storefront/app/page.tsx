@@ -5,6 +5,7 @@ import { FeaturedProducts } from "@/components/home/featured-products";
 import { TrustSignals } from "@/components/home/trust-signals";
 import { FeatureHighlights } from "@/components/home/feature-highlights";
 import { PromoBanner } from "@/components/home/promo-banner";
+import { CommerceCatalog } from "@/components/commerce/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,7 @@ async function getCategories() {
 }
 
 export default async function HomePage() {
+  if (process.env.COMMERCE_API_URL) return <div className="min-h-screen"><HeroSection /><CommerceCatalog featured /><FeatureHighlights /><TrustSignals /></div>;
   const [products, categories] = await Promise.all([getProducts(), getCategories()]);
 
   return (

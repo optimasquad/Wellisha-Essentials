@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/products/product-detail";
+import { CommerceProductDetail } from "@/components/commerce/product-detail";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,7 @@ export default async function ProductPage({
 }: {
   params: { slug: string };
 }) {
+  if (process.env.COMMERCE_API_URL) return <CommerceProductDetail slug={params.slug} />;
   const product = await getProduct(params?.slug ?? "");
 
   if (!product) {

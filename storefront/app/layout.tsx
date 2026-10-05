@@ -38,11 +38,11 @@ export default function RootLayout({
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
           <div className="flex min-h-screen flex-col">
-            <Header />
+            <Header commerceEnabled={!!process.env.COMMERCE_API_URL} />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
-          <DiscountPopup />
+          {!process.env.COMMERCE_API_URL && <DiscountPopup />}
         </Providers>
       </body>
     </html>

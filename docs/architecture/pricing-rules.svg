@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc">
+  <title id="title">Wellisha: four simple pricing rules and automatic storefront refresh</title>
+  <desc id="desc">A base price and one scheduled offer per SKU. Percentage, fixed amount, bundle price or buy X get Y. A scoped API updates versioned and audited database rules. Server time evaluates current rules. Public catalog and owned cart APIs return prices. Visible UI refetches within fifteen seconds, sooner at boundaries or on focus. Historical order prices stay immutable.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#7b3ba4"/></marker>
+    <style>
+      text{font-family:'Segoe UI',Arial,sans-serif;fill:#243047}
+      .title{font-size:34px;font-weight:700}.subtitle{font-size:20px;fill:#566174}
+      .cardTitle{font-size:23px;font-weight:700}.body{font-size:19px}.small{font-size:17px;fill:#566174}
+      .purple{fill:#713591}.rule{fill:#fff;stroke:#e1d7e8;stroke-width:2}.step{fill:#fff;stroke:#bda6cf;stroke-width:2}
+      .link{fill:none;stroke:#7b3ba4;stroke-width:3;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="1120" fill="#faf7f2"/>
+  <rect x="48" y="42" width="7" height="76" rx="3" fill="#f27784"/>
+  <text x="76" y="76" class="title">Wellisha pricing — simple rules, live prices</text>
+  <text x="76" y="112" class="subtitle">One base price · one active offer per SKU · no stacking · no UI release for price changes</text>
+  <text x="60" y="166" class="small">FOUR RULE TYPES  /  EXAMPLES USE A ₹200 BASE PRICE</text>
+  <rect x="60" y="188" width="355" height="242" rx="18" class="rule"/>
+  <rect x="435" y="188" width="355" height="242" rx="18" class="rule"/>
+  <rect x="810" y="188" width="355" height="242" rx="18" class="rule"/>
+  <rect x="1185" y="188" width="355" height="242" rx="18" class="rule"/>
+  <text x="83" y="226" class="cardTitle purple">1  Percentage off</text>
+  <text x="83" y="266" class="body">15% off → ₹170 each</text>
+  <text x="83" y="306" class="small">API value: 1500 basis points</text>
+  <text x="83" y="336" class="small">Optional minimum quantity</text>
+  <text x="83" y="388" class="small">Discount rounded down in paise</text>
+  <text x="458" y="226" class="cardTitle purple">2  Fixed amount off</text>
+  <text x="458" y="266" class="body">₹50 off → ₹150 each</text>
+  <text x="458" y="306" class="small">API value: 5000 paise</text>
+  <text x="458" y="336" class="small">Optional minimum quantity</text>
+  <text x="458" y="388" class="small">Never below zero</text>
+  <text x="833" y="226" class="cardTitle purple">3  Bundle price</text>
+  <text x="833" y="266" class="body">3 packs for ₹499</text>
+  <text x="833" y="306" class="small">3 units: ₹499 · 4 units: ₹699</text>
+  <text x="833" y="336" class="small">6 units: ₹998</text>
+  <text x="833" y="388" class="small">Complete groups; base-price extras</text>
+  <text x="1208" y="226" class="cardTitle purple">4  Buy X, get Y free</text>
+  <text x="1208" y="266" class="body">Buy 2, get 1 free</text>
+  <text x="1208" y="306" class="small">3 units: ₹400 · 5 units: ₹800</text>
+  <text x="1208" y="336" class="small">6 units: ₹800</text>
+  <text x="1208" y="388" class="small">Cart quantity includes free units</text>
+  <text x="60" y="491" class="small">CHANGE DATA ONCE  /  THE BACKEND EVALUATES IT EVERY TIME</text>
+  <rect x="60" y="516" width="460" height="177" rx="18" class="step"/>
+  <rect x="570" y="516" width="460" height="177" rx="18" class="step"/>
+  <rect x="1080" y="516" width="460" height="177" rx="18" class="step"/>
+  <rect x="60" y="771" width="460" height="177" rx="18" class="step"/>
+  <rect x="570" y="771" width="460" height="177" rx="18" class="step"/>
+  <rect x="1080" y="771" width="460" height="177" rx="18" class="step"/>
+  <text x="85" y="554" class="cardTitle">1  Authorized price update</text>
+  <text x="85" y="594" class="body">Base price + full offer schedule</text>
+  <text x="85" y="627" class="body">Expected version + audit reason</text>
+  <text x="85" y="663" class="small">Cognito scope AND database permission</text>
+  <text x="595" y="554" class="cardTitle">2  Validate &amp; commit</text>
+  <text x="595" y="594" class="body">No overlap or invalid amounts</text>
+  <text x="595" y="627" class="body">Atomic version check and audit</text>
+  <text x="595" y="663" class="small">Stale version: 409 · invalid rule: 400</text>
+  <text x="1105" y="554" class="cardTitle">3  PostgreSQL source of truth</text>
+  <text x="1105" y="594" class="body">Versioned base prices and schedules</text>
+  <text x="1105" y="627" class="body">Past order line snapshots preserved</text>
+  <text x="1105" y="663" class="small">No browser totals or local price constants</text>
+  <text x="1105" y="809" class="cardTitle">4  Evaluate at server time</text>
+  <text x="1105" y="849" class="body">Start inclusive · end exclusive</text>
+  <text x="1105" y="882" class="body">Apply one rule to qualifying quantity</text>
+  <text x="1105" y="918" class="small">Product = one unit · cart = full line</text>
+  <text x="595" y="809" class="cardTitle">5  Catalog &amp; owned-cart APIs</text>
+  <text x="595" y="849" class="body">Prices, savings and offer labels</text>
+  <text x="595" y="882" class="body">One pricing instant per response</text>
+  <text x="595" y="918" class="small">No-store + recommended refresh delay</text>
+  <text x="85" y="809" class="cardTitle">6  Open UI refreshes itself</text>
+  <text x="85" y="849" class="body">Visible views refetch within 15 sec</text>
+  <text x="85" y="882" class="body">Sooner at boundaries / focus / online</text>
+  <text x="85" y="918" class="small">No page reload · hidden tabs pause</text>
+  <path d="M520 602H558" class="link"/>
+  <path d="M1030 602H1068" class="link"/>
+  <path d="M1310 693V757" class="link"/>
+  <path d="M1080 858H1042" class="link"/>
+  <path d="M570 858H532" class="link"/>
+  <rect x="60" y="995" width="1480" height="78" rx="14" fill="#f1e8f6"/>
+  <text x="85" y="1027" class="body">Simple first scope: same SKU only. Mixed bundles, coupon stacking and custom scripts need a separate policy.</text>
+  <text x="85" y="1056" class="small">Cart checks stock but does not reserve it. Checkout stays disabled until quotes, expiry and provider acceptance pass.</text>
+</svg>

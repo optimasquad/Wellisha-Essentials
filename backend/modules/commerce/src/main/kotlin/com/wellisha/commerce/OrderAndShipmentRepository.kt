@@ -7,11 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Repository
-class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mapper: ObjectMapper) {
-    fun products(): List<ProductView> = jdbc.sql("""SELECT id,name,sku,price_minor,(stock>0) AS available
-        FROM commerce.product WHERE active=true ORDER BY id LIMIT 100""")
-        .query { rs,_ -> ProductView(rs.getString("id"),rs.getString("name"),rs.getString("sku"),
-            rs.getLong("price_minor"),rs.getBoolean("available")) }.list()
+class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mapper: ObjectMapper,private val catalog: CatalogPricingRepository) {
 
     @Transactional
     fun createOrder(customer: String,key: String,input: CreateOrderInput): OrderView {
@@ -35,14 +31,21 @@ class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mappe
             }.optional().orElseThrow { MissingResource() }
         require(input.items.map { it.productId }.distinct().size==input.items.size)
         val id = UUID.randomUUID().toString()
+        // Lock all requested SKUs in a stable order before taking one database pricing timestamp.
+        input.items.sortedBy { it.productId }.forEach { line ->
+            jdbc.sql("SELECT id FROM commerce.product WHERE id=:id AND active=true FOR UPDATE")
+                .param("id",line.productId).query(String::class.java).optional().orElseThrow { MissingResource() }
+        }
+        val pricedAt=catalog.databaseTime()
+        data class PricedLine(val input: OrderLineInput,val product: ProductView,val discount: Long,val total: Long)
         val prices = input.items.sortedBy { it.productId }.map { line ->
-            val price=jdbc.sql("SELECT price_minor FROM commerce.product WHERE id=:id AND active=true FOR UPDATE")
-                .param("id",line.productId).query(Long::class.java).optional().orElseThrow { MissingResource() }
+            val product=catalog.productAt(line.productId,pricedAt)
+            val discount=catalog.lineDiscount(line.productId,line.quantity,pricedAt)
             if(jdbc.sql("UPDATE commerce.product SET stock=stock-:q WHERE id=:id AND stock>=:q")
                 .param("q",line.quantity).param("id",line.productId).update()!=1) throw StateConflict()
-            line to Money.line(price,line.quantity)
+            PricedLine(line,product,discount,Money.line(product.basePriceMinor,line.quantity)-discount)
         }
-        val subtotal=Money.total(prices.map { it.second })
+        val subtotal=Money.total(prices.map { it.total })
         // Existing store policy retained. Must be commercially approved before cutover.
         val shipping=if(subtotal>49900L) 0L else 4900L
         val total=Math.addExact(subtotal,shipping)
@@ -51,9 +54,12 @@ class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mappe
             'AWAITING_PAYMENT',CAST(:address AS jsonb),:key,:hash)""")
             .param("id",id).param("customer",customer).param("total",total)
             .param("address",mapper.writeValueAsString(address)).param("key",key).param("hash",requestHash).update()
-        prices.forEach { (line,amount) ->
-            jdbc.sql("INSERT INTO commerce.order_line(order_id,product_id,quantity,total_minor) VALUES(:order,:product,:q,:total)")
-                .param("order",id).param("product",line.productId).param("q",line.quantity).param("total",amount).update()
+        prices.forEach { priced ->
+            jdbc.sql("""INSERT INTO commerce.order_line(order_id,product_id,quantity,total_minor,base_unit_price_minor,discount_minor,price_version,offer_title)
+                VALUES(:order,:product,:q,:total,:base,:discount,:version,:offer)""")
+                .param("order",id).param("product",priced.input.productId).param("q",priced.input.quantity).param("total",priced.total)
+                .param("base",priced.product.basePriceMinor).param("discount",priced.discount).param("version",priced.product.priceVersion)
+                .param("offer",priced.product.offerTitle).update()
         }
         jdbc.sql("INSERT INTO commerce.outbox(id,aggregate_id,event_type,payload) VALUES(:id,:order,'PaymentSetupRequested',CAST(:payload AS jsonb))")
             .param("id",UUID.randomUUID().toString()).param("order",id)
@@ -92,4 +98,3 @@ class OrderAndShipmentRepository(private val jdbc: JdbcClient, private val mappe
             .param("id",id).param("customer",customer).update()!=1) throw MissingResource()
     }
 }
-

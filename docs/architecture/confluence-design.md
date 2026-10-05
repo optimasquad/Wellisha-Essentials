@@ -16,7 +16,9 @@ Confirmed backend choice: Kotlin + Spring Boot with PostgreSQL. Separate the exi
 
 The same versioned API serves the website and the initial Android/iOS applications. Retain the current web investment; use React Native with Expo as the proposed mobile direction after a proof of concept for authentication, Razorpay, deep links, and release builds. Share API contracts and business types, while keeping platform-specific presentation and token storage separate.
 
-This is a design and migration proposal. The existing code has not yet gained these capabilities, and an architecture cannot guarantee zero bugs. Section 13 defines the verification required before release.
+This document describes the target design alongside the implemented foundation.
+See the execution status for verified capabilities and remaining gates; an
+architecture cannot guarantee zero bugs. Section 13 defines release verification.
 
 ### Working Assumptions
 
@@ -86,19 +88,46 @@ Cache hashed static assets and public images at CloudFront. Initially disable CD
 
 ## 4. Code Separation and API Contracts
 
-Proposed future repository structure; these directories are not implemented by this proposal:
+Current repository decision: keep independent `storefront/` and `backend/`
+projects in one repository. The backend Gradle project is `wellisha-services`,
+with independently built API, worker and schema executables.
+
+### API-controlled pricing and automatic UI refresh
+
+Prices and offers are editable server data. The initial evaluator has four
+simple rule types: percentage off, fixed amount off, a fixed total for a bundle,
+and buy-X-get-Y free. Rules apply to one SKU with a clear quantity threshold and
+UTC start/end, with no stacking or overlapping campaigns. Keep mixed-SKU bundles
+and arbitrary rule expressions outside this first slice.
+
+Version-checked pricing writes require a configured Cognito scope plus a
+server-owned permission and create an atomic audit record. Public catalog/detail
+and owned-cart APIs evaluate the same rules at database time. The UI reads their
+base price, effective price, offer label and savings; it does not calculate the
+charged amount. Open visible views refresh within 15 seconds, earlier at schedule
+boundaries and when focus/network connectivity returns. No-store prevents stale
+HTTP cache reuse. Future cache/SSE publication must preserve this fallback.
+
+Order lines keep immutable pricing snapshots. Quotes, price-change acceptance
+and reservation expiry remain required before enabling checkout. See
+[complete pricing policy and examples](../implementation/pricing-rules.md),
+[SVG diagram](pricing-rules.svg) and [.agents guidance](../../.agents/pricing-rules.md).
+
+Current repository structure, with native applications still planned:
 
 ```text
-apps/web/                 Next.js storefront and staff/agent console
-apps/mobile/              React Native/Expo Android and iOS clients
-services/commerce-api/    Kotlin + Spring Boot API, domain modules, authorization
-services/workers/         Kotlin + Spring Boot queue consumers and outbox relay
-packages/contracts/      OpenAPI spec, schemas, generated client SDK
-packages/domain/         Backend-only rules and value objects
-packages/database/       Flyway SQL migrations, Kotlin repositories, PostgreSQL models
-packages/observability/  Structured telemetry helpers
-infra/cdk/               AWS stacks per environment
-docs/architecture/       Architecture and decision records
+storefront/              Independent Next.js UI and session/BFF project
+backend/                 wellisha-services Gradle project
+  apps/api/              Commerce HTTP API, authorization and safe diagnostics
+  apps/worker/           Independently built transactional outbox relay
+  apps/schema/           Schema initializer and versioned Flyway SQL
+  modules/commerce/      Backend rules, DTOs and JDBC repositories
+  contracts/             Shared OpenAPI contract
+  local/                 Isolated PostgreSQL development configuration
+apps/mobile/             Planned React Native/Expo clients
+infra/cdk/               AWS infrastructure definitions
+docs/architecture/       Architecture, SVG diagrams and decision records
+.agents/                 Pricing reference guidance
 ```
 
 Use REST JSON under `/v1`, cursor pagination, stable error codes, correlation IDs, ISO-8601 UTC timestamps, and currency plus integer minor units. Use Kotlin + Spring Boot and Spring Security for the API; avoid coupling domain logic to Next.js request objects. Validate Cognito access tokens, enforce ownership and permissions at each operation, and generate TypeScript/mobile clients from OpenAPI with compatibility checks in CI. Configure Kotlin Spring support and strict nullability checks; pin tested dependencies. [Spring Boot Kotlin support](https://docs.spring.io/spring-boot/reference/features/kotlin.html)

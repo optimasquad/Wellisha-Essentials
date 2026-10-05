@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Wellisha Commerce API",
-    "version": "0.1.0",
-    "description": "Implemented foundation only. Cognito access tokens (token_use=access, configured issuer/client_id); no cookie or legacy-session authentication and no extra scope enforcement yet. JSON requests limited to 16384 bytes; compressed bodies rejected. Monetary values are exact integer minor units on JVM; TypeScript clients must reject unsafe integers. Categories, carts, quotes, providers and staff operations are future contracts."
+    "version": "0.2.0",
+    "description": "Implemented commerce foundation. Cognito access tokens require the configured issuer/client_id; no legacy cookie authentication. JSON bodies are limited to 16384 bytes; compressed bodies are rejected. Catalog list returns a page envelope. Four simple non-stacking same-SKU offer types share one evaluator with owned carts and order lines. Percentage discounts round down per unit before multiplying quantity. Visible clients refetch within 15 seconds or sooner at schedule boundaries. Buy-X-get-Y quantities include free units. Cart totals are not checkout quotes. Pricing administration requires wellisha/pricing.write scope AND a server-owned catalog.pricing.write permission. Checkout remains disabled by default until provider/reservation/quote acceptance. TypeScript consumers reject unsafe integer money."
   },
   "security": [
     {
@@ -328,37 +328,34 @@
     "/v1/products": {
       "get": {
         "operationId": "listProducts",
-        "description": "Active products, limited to 100 ordered by ID. No filtering or pagination yet.",
+        "description": "Paged active sellable SKUs with API-calculated prices. Sort by effective single-unit price. Each SKU is a pack/variant in this first slice. Offset pages may shift during catalog edits; quotes revalidate prices before checkout.",
         "responses": {
           "200": {
             "description": "Success",
             "headers": {
-              "X-Correlation-ID": {
-                "description": "Server-generated diagnostic ID.",
-                "schema": {
-                  "type": "string",
-                  "format": "uuid"
-                }
-              },
               "Cache-Control": {
-                "description": "Responses are not cached.",
                 "schema": {
                   "type": "string"
                 },
                 "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
               }
             },
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProductView"
-                  },
-                  "maxItems": 100
+                  "$ref": "#/components/schemas/CatalogPage"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
           },
           "413": {
             "$ref": "#/components/responses/TooLarge"
@@ -373,7 +370,60 @@
             "$ref": "#/components/responses/Unavailable"
           }
         },
-        "security": []
+        "security": [],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 0,
+              "maximum": 10000,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 120
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "latest",
+                "price-asc",
+                "price-desc"
+              ],
+              "default": "latest"
+            }
+          }
+        ]
       }
     },
     "/v1/orders": {
@@ -787,6 +837,493 @@
           }
         ]
       }
+    },
+    "/v1/products/{slug}": {
+      "get": {
+        "operationId": "getProduct",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMedia"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "security": [],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/categories": {
+      "get": {
+        "operationId": "listCategories",
+        "security": [],
+        "description": "Active categories ordered by sort order and ID.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryView"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1/admin/products/{id}/pricing": {
+      "patch": {
+        "operationId": "updatePricing",
+        "description": "Requires wellisha/pricing.write Cognito scope AND server-owned catalog.pricing.write permission for issuer/subject. Replaces base price and complete offer schedule using expected version. No overlapping offers, no stacking, all four rule types same SKU only. Audit committed atomically. Missing/stale product version returns 409. Staff MFA remains a production configuration gate.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductDetailView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMedia"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PricingInput"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getPricingConfiguration",
+        "description": "Reads base price, current version and full current schedule including future offers. Requires the same scope and server-owned permission as pricing writes.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PricingConfiguration"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMedia"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/v1/cart": {
+      "get": {
+        "operationId": "getCart",
+        "description": "Owned cart, repriced on every read. No stock reservation or payment commitment. Server returns exact line totals and savings. No coupon stacking.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CartView"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMedia"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/v1/cart/items": {
+      "post": {
+        "operationId": "addCartItem",
+        "description": "Adds quantity to the owned SKU line, maximum 100 per line and 50 distinct lines. Checks stock; does not reserve it.",
+        "responses": {
+          "204": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMedia"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartItemInput"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/cart/items/{id}": {
+      "patch": {
+        "operationId": "updateCartItem",
+        "description": "",
+        "responses": {
+          "204": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMedia"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CartQuantityInput"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCartItem",
+        "description": "",
+        "responses": {
+          "204": {
+            "description": "Success",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "no-store"
+              },
+              "X-Correlation-ID": {
+                "schema": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/TooLarge"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMedia"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -936,7 +1473,17 @@
           "name",
           "sku",
           "priceMinor",
-          "available"
+          "available",
+          "slug",
+          "description",
+          "image",
+          "categoryId",
+          "basePriceMinor",
+          "discountMinor",
+          "offerTitle",
+          "priceVersion",
+          "currency",
+          "offerSummary"
         ],
         "properties": {
           "id": {
@@ -955,6 +1502,45 @@
           },
           "available": {
             "type": "boolean"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "categoryId": {
+            "type": "string",
+            "nullable": true
+          },
+          "basePriceMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "discountMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "offerTitle": {
+            "type": "string",
+            "nullable": true
+          },
+          "priceVersion": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string"
+          },
+          "offerSummary": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1142,6 +1728,326 @@
           "correlationId": {
             "type": "string",
             "format": "uuid"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CategoryView": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "slug"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CatalogPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "hasMore",
+          "pricedAt",
+          "refreshAfterMs"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductView"
+            },
+            "maxItems": 100
+          },
+          "page": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "pricedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "refreshAfterMs": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1000,
+            "maximum": 15000
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductDetailView": {
+        "type": "object",
+        "required": [
+          "product",
+          "pricedAt",
+          "refreshAfterMs"
+        ],
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ProductView"
+          },
+          "pricedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "refreshAfterMs": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1000,
+            "maximum": 15000
+          }
+        },
+        "additionalProperties": false
+      },
+      "OfferInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "kind",
+          "value",
+          "startsAt",
+          "endsAt"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "PERCENTAGE",
+              "FIXED_AMOUNT",
+              "BUNDLE_PRICE",
+              "BUY_X_GET_Y"
+            ]
+          },
+          "value": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "PERCENTAGE: basis points (1500=15%); FIXED_AMOUNT: discount per unit in minor units; BUNDLE_PRICE: total for buyQuantity units; BUY_X_GET_Y: zero. See pricing rules for kind-specific limits."
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "buyQuantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 1
+          },
+          "freeQuantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 99,
+            "default": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "PricingInput": {
+        "type": "object",
+        "required": [
+          "version",
+          "basePriceMinor",
+          "offers",
+          "reason"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "basePriceMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "maximum": 1801439850948
+          },
+          "offers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfferInput"
+            },
+            "maxItems": 10
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        },
+        "additionalProperties": false
+      },
+      "CartItemInput": {
+        "type": "object",
+        "required": [
+          "productId",
+          "quantity"
+        ],
+        "properties": {
+          "productId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "CartQuantityInput": {
+        "type": "object",
+        "required": [
+          "quantity"
+        ],
+        "properties": {
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "additionalProperties": false
+      },
+      "CartItemView": {
+        "type": "object",
+        "required": [
+          "id",
+          "quantity",
+          "product",
+          "lineTotalMinor",
+          "lineDiscountMinor",
+          "purchasable"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductView"
+          },
+          "lineTotalMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "lineDiscountMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "purchasable": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CartView": {
+        "type": "object",
+        "required": [
+          "items",
+          "subtotalMinor",
+          "savingsMinor",
+          "currency",
+          "pricedAt",
+          "refreshAfterMs"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItemView"
+            },
+            "maxItems": 50
+          },
+          "subtotalMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "savingsMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "currency": {
+            "type": "string"
+          },
+          "pricedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "refreshAfterMs": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1000,
+            "maximum": 15000
+          }
+        },
+        "additionalProperties": false
+      },
+      "PricingConfiguration": {
+        "type": "object",
+        "required": [
+          "version",
+          "basePriceMinor",
+          "offers"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "basePriceMinor": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "offers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OfferInput"
+            },
+            "maxItems": 10
           }
         },
         "additionalProperties": false

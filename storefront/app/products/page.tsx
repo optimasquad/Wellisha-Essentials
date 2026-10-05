@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { ProductGrid } from "@/components/products/product-grid";
 import { ProductFilters } from "@/components/products/product-filters";
+import { CommerceCatalog } from "@/components/commerce/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +69,7 @@ export default async function ProductsPage({
 }: {
   searchParams: SearchParams;
 }) {
+  if (process.env.COMMERCE_API_URL) return <CommerceCatalog key={JSON.stringify(searchParams)} filters={searchParams} />;
   const [products, categories] = await Promise.all([
     getProducts(searchParams ?? {}),
     getCategories(),

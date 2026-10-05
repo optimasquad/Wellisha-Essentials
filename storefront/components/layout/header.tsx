@@ -5,6 +5,8 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { ShoppingCart, Search, Menu, X, User, LogOut, Package, LayoutDashboard, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLiveCommerce } from "@/hooks/use-live-commerce";
+import { isCart, isCatalogPage } from "@/lib/catalog-data";
 
 const shopCategories = [
   { name: "Period Care", emoji: "🩸", href: "/products?category=period-care", active: true },
@@ -13,7 +15,7 @@ const shopCategories = [
   { name: "Skin Care", emoji: "💆", href: "#", active: false, comingSoon: true },
 ];
 
-export function Header() {
+export function Header({ commerceEnabled = false }: { commerceEnabled?: boolean }) {
   const { data: session, status } = useSession() || {};
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -22,6 +24,16 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false);
   const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
+  const liveCart = useLiveCommerce("/api/commerce/cart",isCart,session?.user?.id ?? "",commerceEnabled && status === "authenticated");
+  const liveOffers = useLiveCommerce("/api/catalog?size=8",isCatalogPage,"public",commerceEnabled);
+  const displayCartCount = commerceEnabled ? liveCart.data?.items.reduce((sum,item)=>sum+item.quantity,0) ?? 0 : cartCount;
+  const announcement = liveOffers.error ? "Explore Wellisha essentials" : liveOffers.data?.items.find(p=>p.offerSummary)?.offerSummary ?? "Explore Wellisha essentials";
+  useEffect(() => {
+    if (!commerceEnabled) return;
+    const refresh = () => liveCart.refresh();
+    window.addEventListener("wellisha-cart-changed",refresh);
+    return () => window.removeEventListener("wellisha-cart-changed",refresh);
+  }, [commerceEnabled,session?.user?.id]);
 
   useEffect(() => {
     setMounted(true);
@@ -36,10 +48,10 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    if (session?.user?.id) {
+    if (!commerceEnabled && session?.user?.id) {
       fetchCartCount();
     }
-  }, [session?.user?.id]);
+  }, [session?.user?.id,commerceEnabled]);
 
   const fetchCartCount = async () => {
     try {
@@ -67,7 +79,7 @@ export function Header() {
     <>
       {/* Announcement Bar */}
       <div className="bg-[#FF6B6B] text-white text-center py-2 px-4 text-sm font-medium">
-        Use code <span className="font-bold">TRIPLE15</span> to avail <span className="font-bold">15% OFF</span> on 3 or more products
+        {commerceEnabled ? announcement : <>Use code <span className="font-bold">TRIPLE15</span> to avail <span className="font-bold">15% OFF</span> on 3 or more products</>}
       </div>
 
       {/* Main Header */}
@@ -220,9 +232,9 @@ export function Header() {
                 className="relative p-2 text-gray-700 hover:text-[#FF6B6B] transition-colors"
               >
                 <ShoppingCart size={20} />
-                {cartCount > 0 && (
+                {displayCartCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-[#FF6B6B] text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                    {cartCount}
+                    {displayCartCount}
                   </span>
                 )}
               </Link>

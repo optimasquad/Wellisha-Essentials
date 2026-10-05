@@ -23,7 +23,6 @@ class CommerceController(private val customers: CustomerAddressRepository,privat
         @Valid @RequestBody input: VersionedAddressInput) = customers.updateAddress(owner(jwt),id,input)
     @DeleteMapping("/me/addresses/{id}") @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteAddress(@AuthenticationPrincipal jwt: Jwt,@PathVariable id: String) = customers.deleteAddress(owner(jwt),id)
-    @GetMapping("/products") fun products() = commerce.products()
     @PostMapping("/orders") fun createOrder(@AuthenticationPrincipal jwt: Jwt,
         @RequestHeader("Idempotency-Key") key: String,@Valid @RequestBody input: CreateOrderInput): ResponseEntity<OrderView> {
         if(!env.getProperty("CHECKOUT_ENABLED",Boolean::class.java,false)) {

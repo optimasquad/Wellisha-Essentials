@@ -36,6 +36,16 @@ export type ProductView = {
   "sku": string;
   "priceMinor": number;
   "available": boolean;
+  "slug": string;
+  "description": string;
+  "image": string;
+  "categoryId": string | null;
+  "basePriceMinor": number;
+  "discountMinor": number;
+  "offerTitle": string | null;
+  "priceVersion": number;
+  "currency": string;
+  "offerSummary": string | null;
 };
 
 export type OrderLineInput = {
@@ -83,4 +93,74 @@ export type NotificationView = {
 export type ApiError = {
   "code": string;
   "correlationId": string;
+};
+
+export type CategoryView = {
+  "id": string;
+  "name": string;
+  "slug": string;
+};
+
+export type CatalogPage = {
+  "items": Array<ProductView>;
+  "page": number;
+  "hasMore": boolean;
+  "pricedAt": string;
+  "refreshAfterMs": number;
+};
+
+export type ProductDetailView = {
+  "product": ProductView;
+  "pricedAt": string;
+  "refreshAfterMs": number;
+};
+
+export type OfferInput = {
+  "title": string;
+  "kind": "PERCENTAGE" | "FIXED_AMOUNT" | "BUNDLE_PRICE" | "BUY_X_GET_Y";
+  "value": number;
+  "startsAt": string;
+  "endsAt": string;
+  "buyQuantity"?: number;
+  "freeQuantity"?: number;
+};
+
+export type PricingInput = {
+  "version": number;
+  "basePriceMinor": number;
+  "offers": Array<OfferInput>;
+  "reason": string;
+};
+
+export type CartItemInput = {
+  "productId": string;
+  "quantity": number;
+};
+
+export type CartQuantityInput = {
+  "quantity": number;
+};
+
+export type CartItemView = {
+  "id": string;
+  "quantity": number;
+  "product": ProductView;
+  "lineTotalMinor": number;
+  "lineDiscountMinor": number;
+  "purchasable": boolean;
+};
+
+export type CartView = {
+  "items": Array<CartItemView>;
+  "subtotalMinor": number;
+  "savingsMinor": number;
+  "currency": string;
+  "pricedAt": string;
+  "refreshAfterMs": number;
+};
+
+export type PricingConfiguration = {
+  "version": number;
+  "basePriceMinor": number;
+  "offers": Array<OfferInput>;
 };

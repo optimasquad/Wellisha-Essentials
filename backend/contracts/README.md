@@ -1,9 +1,13 @@
 # Commerce wire contract
 
 `openapi.json` describes the implemented HTTP foundation using
-[OpenAPI 3.0.3](https://spec.openapis.org/oas/v3.0.3.html). Future catalog detail,
-cart, quote, payment, shipping intake and staff endpoints remain in the code plan.
-The contract does not enable checkout or imply provider acceptance.
+[OpenAPI 3.0.3](https://spec.openapis.org/oas/v3.0.3.html). Quotes, payment,
+shipping intake and the remaining staff workflows remain in the code plan.
+The contract does not enable checkout or imply provider acceptance. Version
+0.2.0 adds paged catalog/category/detail, owned carts and pricing configuration
+read/write operations. The product list changed from an array to a page envelope.
+Future work still includes parent-product variant grouping, quotes/providers,
+mixed-SKU offers and the complete staff console.
 
 Update the contract with each controller/DTO change. From `storefront/`, run:
 
@@ -26,8 +30,11 @@ Run `gradlew.bat --offline :apps:api:test` from `backend/` with Java 21 configur
 These checks cover the current wire subset; they are not a general OpenAPI
 validation suite or proof of database/provider/browser acceptance.
 
-Bearer authentication applies to all customer endpoints. Only GET /v1/products
-is public. Missing/invalid bearer authentication can have an empty 401 body;
+Bearer authentication applies to all customer endpoints. Category, product list
+and product detail reads are public. Pricing configuration requires both a
+custom Cognito scope and a server-owned database permission. Missing/invalid
+bearer authentication can have an empty 401 body;
 checkout disabled returns an empty 503. Address version conflicts return 404.
-Lists currently have fixed limits without pagination. The Next.js BFF has its
+Catalog lists now support bounded pagination; account lists still have fixed
+limits. The Next.js BFF has its
 own local error shapes and exposes a subset of these routes.

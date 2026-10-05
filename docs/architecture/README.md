@@ -50,3 +50,10 @@ The separate Miro layout generator is `rebuild-miro.mjs`. Its SVG and PNG previe
 
 
 Amazon Shipping is the selected carrier for Wellisha-packed parcels. See [integration requirements and architecture](../implementation/amazon-shipping-integration.md) and the new Shipping Miro frame recorded in publication-record.json. Commercial/API onboarding and implementation remain pending.
+
+## Pricing rules
+
+The API-controlled pricing design is documented in
+[pricing rules and worked examples](../implementation/pricing-rules.md).
+Download the [SVG rules diagram](pricing-rules.svg); agent guidance is in
+[.agents/pricing-rules.md](../../.agents/pricing-rules.md).

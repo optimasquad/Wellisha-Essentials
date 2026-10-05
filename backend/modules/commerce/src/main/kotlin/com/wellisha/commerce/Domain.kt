@@ -19,7 +19,12 @@ data class AddressInput(
     @field:Pattern(regexp="^[1-9][0-9]{5}$") val pincode: String
 )
 data class VersionedAddressInput(val version: Long, @field:jakarta.validation.Valid val address: AddressInput)
-data class ProductView(val id: String, val name: String, val sku: String, val priceMinor: Long, val available: Boolean)
+data class ProductView(
+    val id: String, val name: String, val sku: String, val priceMinor: Long, val available: Boolean,
+    val slug: String = id, val description: String = "", val image: String = "/products/wellisha-hero.jpg",
+    val categoryId: String? = null, val basePriceMinor: Long = priceMinor, val discountMinor: Long = 0,
+    val offerTitle: String? = null, val priceVersion: Long = 0, val currency: String = "INR", val offerSummary: String? = null
+)
 data class OrderLineInput(@field:NotBlank @field:Size(max=100) val productId: String, @field:Min(1) @field:Max(100) val quantity: Int)
 data class CreateOrderInput(
     @field:NotBlank @field:Size(max=100) val addressId: String,
@@ -55,4 +60,3 @@ object FulfillmentRules {
         else -> "DELIVERY_EXCEPTION"
     }
 }
-

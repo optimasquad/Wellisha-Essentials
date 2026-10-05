@@ -105,6 +105,25 @@ Deliver this slice before live Razorpay or fulfillment side effects. This proves
 
 ## 6. API contract backlog
 
+### Pricing and offer delivery
+
+Prices and offers are API-controlled. Use the four simple same-SKU rules in
+[pricing rules](pricing-rules.md): percentage, fixed amount, bundle total and
+buy-X-get-Y. Operators change data through a version-checked, permission-scoped
+API rather than a UI deployment. One active offer per SKU, no stacking and no
+custom/nested rule language are the initial policy. Base/discount/offer versions
+remain server-owned. The storefront reads current API results and automatically
+refetches visible catalog/product/cart views within 15 seconds, sooner at an
+offer boundary and on focus/online events. Add percentage/fixed thresholds and
+worked bundle/free-unit examples to acceptance; do not copy competitor prices.
+
+P05/P12 deliver bounded catalog/detail/category APIs, owned cart CRUD, authoritative
+cart totals and live pricing UI. P06 must add accepted quotes and reservation
+expiry before enabling checkout. Mix-and-match bundles, cross-SKU gifts and coupon
+stacking require a separate approved policy and are outside the four-rule slice.
+See [SVG rules diagram](../architecture/pricing-rules.svg) and
+[agent guidance](../../.agents/pricing-rules.md).
+
 | Module | Initial endpoints | Authorization / invariant |
 | --- | --- | --- |
 | Identity/customer | GET/PATCH /v1/me; GET/POST /v1/me/addresses; PATCH/DELETE /v1/me/addresses/{id} | Authenticated owner; sensitive fields allowlisted |

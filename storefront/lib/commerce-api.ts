@@ -2,6 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { sameOrigin } from "@/lib/request-security";
 
+export async function publicCommerceRequest(path: string) {
+  try {
+    const base = process.env.COMMERCE_API_URL;
+    if (!base) throw new Error("Service not configured");
+    const target = new URL(base);
+    if (target.protocol !== "https:" && !(process.env.NODE_ENV !== "production" && target.hostname === "127.0.0.1")) throw new Error("Invalid service URL");
+    const result = await fetch(new URL(path,target), { cache: "no-store", redirect: "error", signal: AbortSignal.timeout(8000) });
+    const body = await result.text();
+    return new NextResponse(body || null, { status: result.status, headers: {
+      ...(body ? { "Content-Type": "application/json" } : {}), "Cache-Control": "no-store",
+      "X-Correlation-ID": result.headers.get("X-Correlation-ID") ?? "",
+    } });
+  } catch {
+    return NextResponse.json({ code: "SERVICE_UNAVAILABLE" }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
+}
+
 export async function commerceRequest(request: NextRequest, path: string, init: RequestInit = {}) {
   const base = process.env.COMMERCE_API_URL;
   if (!base) return NextResponse.json({ error: "Commerce service is not configured", code: "SERVICE_NOT_READY" }, { status: 503 });
@@ -32,4 +49,3 @@ export async function commerceRequest(request: NextRequest, path: string, init: 
     return NextResponse.json({ error: "Service temporarily unavailable" }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
 }
-

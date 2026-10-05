@@ -12,6 +12,12 @@ Use Kotlin/JUnit, Spring HTTP/security, real PostgreSQL Testcontainers with Flyw
 
 ## Unit tests
 
+Pricing slice: seven `PricingRulesTest` cases and nine `CatalogPricingPostgresTest`
+scenarios passed, alongside the existing suites. All 19 storefront tests passed,
+including bounded automatic refresh, hidden-tab pause, focus/online resume,
+non-overlapping requests and stopped-view cleanup. Full browser/Cognito acceptance
+is still pending. See [pricing rules](pricing-rules.md) for the four-rule policy.
+
 | ID | Suggested suite | Scenario | Expected result |
 | --- | --- | --- | --- |
 | U01 | MoneyTest | Rounding and Long overflow | Exact minor units; overflow rejected |

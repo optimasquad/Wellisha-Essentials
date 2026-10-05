@@ -55,8 +55,16 @@ reservation expiry and provider acceptance tests pass.
 
 The implemented wire contract lives in [contracts/openapi.json](contracts/openapi.json).
 See [contract workflow](contracts/README.md) for generated storefront DTO types
-and the route/HTTP response compatibility tests. Transport client generation,
-catalog/cart completion and browser acceptance remain separate work.
+and the route/HTTP response compatibility tests. Generated transport SDKs,
+parent-product variant grouping and browser acceptance remain separate work.
+
+Catalog/category/detail reads and owned cart operations now use API-controlled
+pricing. See [pricing rules](../docs/implementation/pricing-rules.md) for the four
+simple scheduled rule types, permission-scoped configuration read/write API,
+audit/version behavior, UI refresh and operator examples. Same-SKU offers do not
+stack. Stock is not reserved by a cart; checkout remains disabled until quotes,
+reservation expiry and provider acceptance pass. The product list is now a paged
+envelope in contract version 0.2.0. A pack/variant is a sellable SKU in this slice.
 
 All repository values use JDBC parameters. Private responses use no-store.
 Credentials are never logged or included in API errors. Logs include correlation,

@@ -26,6 +26,8 @@ subprojects {
     }
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
+        // Keep JDBC startup and timestamp assertions independent of host timezone aliases.
+        systemProperty("user.timezone", "UTC")
         testLogging { events("failed", "skipped"); showStandardStreams = false }
     }
     tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar>().configureEach {

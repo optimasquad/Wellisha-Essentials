@@ -1,4 +1,8 @@
-# Wellisha backend
+# Wellisha services
+
+`wellisha-services` is the Gradle project in `backend/`, sharing this repository
+with the independent Next.js project in `storefront/`. API, worker and schema
+initializer remain separate build artifacts and deployment units.
 
 A new Kotlin/Spring Boot application. The schema initializer creates and versions
 this application's PostgreSQL schema; it does not import an old application's data.
@@ -48,6 +52,11 @@ returns 503. The new order endpoint is disabled by default until payment,
 reservation expiry and provider acceptance tests pass.
 
 ## Security/observability
+
+The implemented wire contract lives in [contracts/openapi.json](contracts/openapi.json).
+See [contract workflow](contracts/README.md) for generated storefront DTO types
+and the route/HTTP response compatibility tests. Transport client generation,
+catalog/cart completion and browser acceptance remain separate work.
 
 All repository values use JDBC parameters. Private responses use no-store.
 Credentials are never logged or included in API errors. Logs include correlation,

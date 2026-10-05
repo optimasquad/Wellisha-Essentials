@@ -6,7 +6,7 @@ Status: implementation in progress. Kotlin + Spring Boot and PostgreSQL are conf
 
 | Layer | Language / technology | Decision |
 | --- | --- | --- |
-| Website and staff UI | TypeScript, React, Next.js | Retain existing nextjs_space application |
+| Website and staff UI | TypeScript, React, Next.js | Retain existing storefront application |
 | Android / iOS UI | TypeScript, React Native / Expo | Proposed; validate native login, payment and release builds |
 | Commerce API | Kotlin, Spring Boot, Spring MVC, Spring Security | Confirmed backend direction |
 | Async workers | Kotlin, Spring Boot, AWS SDK for Java v2 | Separate deployable process from API |
@@ -15,14 +15,14 @@ Status: implementation in progress. Kotlin + Spring Boot and PostgreSQL are conf
 | Contracts | OpenAPI with generated TypeScript/mobile clients | Shared wire contracts; persistence models stay backend-only |
 | AWS | ECS Fargate, SQS/EventBridge, Cognito, S3, Secrets Manager | Existing architecture; region, sizing and provider access remain to be verified |
 
-Start with a modular commerce backend and a separate worker application sharing domain modules. Deploy independently without creating a separate microservice for every business domain. Keep the website in nextjs_space initially; avoid a frontend directory move while extracting the API.
+Start with a modular commerce backend and a separate worker application sharing domain modules. Deploy independently without creating a separate microservice for every business domain. The website source directory is storefront, named after its customer-facing purpose.
 
 Choose Spring JDBC / JdbcClient with explicit parameterized SQL and Spring-managed transactions initially. This makes PostgreSQL locks, constraints, JSONB queries and reporting visible in the code. JPA can be evaluated later for a specific module rather than becoming a prerequisite. Do not mix reactive request handling with blocking JDBC in the initial backend.
 
 ## 2. Repository layout to create
 
 ```text
-nextjs_space/                         existing TypeScript / Next.js UI and BFF
+storefront/                         existing TypeScript / Next.js UI and BFF
 backend/
   settings.gradle.kts
   build.gradle.kts
@@ -44,7 +44,7 @@ backend/
   modules/reliability/                inbox/outbox, receipts, attempts
   modules/platform/                   configuration, logging, clocks, IDs
   database/src/main/resources/db/migration/
-  contracts/openapi.yaml
+  contracts/openapi.json             implemented wire foundation
   test-support/                       PostgreSQL containers, JWT fixtures, provider stubs
   local/compose.yaml                  local PostgreSQL and optional cache
 infra/cdk/                           AWS stacks and deployment configuration
@@ -59,13 +59,13 @@ Dependencies flow from applications to modules. Modules expose explicit operatio
 
 | Existing file / behavior | Planned change |
 | --- | --- |
-| nextjs_space/app/api/orders/create/route.ts | Remove browser-supplied totals/discounts; validate address ownership; replace with Kotlin quote/order flow |
-| nextjs_space/app/api/orders/verify/route.ts | Bind stored order, owner, provider order and payment; browser return cannot authorize fulfillment |
-| nextjs_space/app/api/cart/route.ts | Scope every cart-item read/write to the authenticated customer |
-| nextjs_space/app/api/addresses/route.ts | Scope address access and immutable order address snapshots |
-| nextjs_space/app/api/admin/* | Replace role-only UI assumptions with server permissions and staff MFA |
-| nextjs_space/lib/auth.ts | Configure Cognito sign-in for the new backend; verify any future account linking separately |
-| nextjs_space/prisma/schema.prisma | Preserve the existing UI schema and user edits; no data import into the new backend |
+| storefront/app/api/orders/create/route.ts | Remove browser-supplied totals/discounts; validate address ownership; replace with Kotlin quote/order flow |
+| storefront/app/api/orders/verify/route.ts | Bind stored order, owner, provider order and payment; browser return cannot authorize fulfillment |
+| storefront/app/api/cart/route.ts | Scope every cart-item read/write to the authenticated customer |
+| storefront/app/api/addresses/route.ts | Scope address access and immutable order address snapshots |
+| storefront/app/api/admin/* | Replace role-only UI assumptions with server permissions and staff MFA |
+| storefront/lib/auth.ts | Configure Cognito sign-in for the new backend; verify any future account linking separately |
+| storefront/prisma/schema.prisma | Preserve the existing UI schema and user edits; no data import into the new backend |
 | Existing server pages querying Prisma | Switch to typed API/BFF calls after equivalent contract behavior passes |
 
 The two order handlers and the Prisma schema were re-read when preparing this plan. The remaining handlers need a complete implementation audit; this inventory is not a full security audit. Preserve the existing uncommitted Prisma portability change.

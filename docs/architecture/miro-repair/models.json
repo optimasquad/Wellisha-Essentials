@@ -1,0 +1,7470 @@
+[
+  {
+    "key": "architecture",
+    "title": "01. High-Level AWS Architecture",
+    "x": 0,
+    "y": -2560,
+    "note": "Chosen backend: Kotlin + Spring Boot; PostgreSQL on RDS. JVM 21 and Mumbai deployment proposed.",
+    "w": 3200,
+    "h": 2240,
+    "nodes": [
+      {
+        "id": "architecture_clients",
+        "label": "Web storefront\nAndroid / iOS apps",
+        "x": 96,
+        "y": 440,
+        "w": 344,
+        "h": 272,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_staff",
+        "label": "Staff console\nCatalog / support",
+        "x": 96,
+        "y": 920,
+        "w": 344,
+        "h": 272,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_art",
+        "label": "Merchandising\nArtwork / video",
+        "x": 96,
+        "y": 1400,
+        "w": 344,
+        "h": 272,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_edge",
+        "label": "Route 53 / ACM\nCloudFront / AWS WAF",
+        "x": 600,
+        "y": 440,
+        "w": 344,
+        "h": 272,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_identity",
+        "label": "Amazon Cognito\nFederated sign-in",
+        "x": 600,
+        "y": 920,
+        "w": 344,
+        "h": 272,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_media",
+        "label": "S3 / media worker\nMediaConvert",
+        "x": 600,
+        "y": 1400,
+        "w": 344,
+        "h": 272,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_web",
+        "label": "Next.js on ECS\nSession BFF\nNo DB access",
+        "x": 1104,
+        "y": 440,
+        "w": 344,
+        "h": 272,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_api",
+        "label": "Kotlin API\nSpring Boot\nCatalog / orders\nPay / track / support",
+        "x": 1608,
+        "y": 440,
+        "w": 344,
+        "h": 300,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_imports",
+        "label": "Kotlin workers\nCatalog imports\nVersioned releases",
+        "x": 1104,
+        "y": 920,
+        "w": 344,
+        "h": 272,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_cache",
+        "label": "Valkey cache\nRead models only",
+        "x": 1104,
+        "y": 1400,
+        "w": 344,
+        "h": 272,
+        "color": "yellow",
+        "shape": "can"
+      },
+      {
+        "id": "architecture_db",
+        "label": "PostgreSQL\nMulti-AZ RDS\nTyped + JSONB\nStock / outbox",
+        "x": 1608,
+        "y": 1400,
+        "w": 344,
+        "h": 272,
+        "color": "yellow",
+        "shape": "can"
+      },
+      {
+        "id": "architecture_events",
+        "label": "Outbox relay\nEventBridge / SQS\nDedicated DLQs",
+        "x": 2112,
+        "y": 1400,
+        "w": 344,
+        "h": 272,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_workers",
+        "label": "Kotlin workers\nSpring Boot\nFulfill / refund\nReconcile / retry",
+        "x": 2112,
+        "y": 920,
+        "w": 344,
+        "h": 272,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_payment",
+        "label": "Razorpay\nPayment / refund",
+        "x": 2616,
+        "y": 440,
+        "w": 344,
+        "h": 272,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_provider",
+        "label": "Amazon MCF / 3PL\nContracted provider",
+        "x": 2616,
+        "y": 920,
+        "w": 344,
+        "h": 272,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "architecture_messages",
+        "label": "SES / AWS SMS\nIndependent workers",
+        "x": 2616,
+        "y": 1400,
+        "w": 344,
+        "h": 272,
+        "color": "plain",
+        "shape": "rectangle"
+      }
+    ],
+    "texts": [
+      {
+        "label": "Identity: clients obtain Cognito tokens; the API enforces roles and resource ownership.",
+        "x": 600,
+        "y": 1792,
+        "w": 2520,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Provider callbacks: verified at the API and durably stored before acknowledgement. Scheduler handles expiry and reconciliation.",
+        "x": 600,
+        "y": 1888,
+        "w": 2520,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "AWS foundation: private subnets / two AZs / scoped IAM / KMS / Secrets Manager / CloudWatch and tracing / tested restores.",
+        "x": 64,
+        "y": 2016,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Delivery: GitHub Actions OIDC → ECR → CDK. Flipkart / Meesho remain optional sales channels, subject to partner access.",
+        "x": 64,
+        "y": 2112,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "HTTPS",
+        "x": 444,
+        "y": 504,
+        "w": 152,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "ALB",
+        "x": 948,
+        "y": 504,
+        "w": 152,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "API",
+        "x": 1452,
+        "y": 504,
+        "w": 152,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "Payment API",
+        "x": 2208,
+        "y": 518,
+        "w": 152,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "Transaction",
+        "x": 1804,
+        "y": 1046,
+        "w": 280,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "Outbox",
+        "x": 1956,
+        "y": 1464,
+        "w": 152,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "Jobs",
+        "x": 2308,
+        "y": 1272,
+        "w": 140,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "Provider API",
+        "x": 2460,
+        "y": 984,
+        "w": 152,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "Updates",
+        "x": 2480,
+        "y": 1272,
+        "w": 280,
+        "size": 28,
+        "bold": false
+      },
+      {
+        "label": "Refresh",
+        "x": 1300,
+        "y": 1272,
+        "w": 280,
+        "size": 28,
+        "bold": false
+      }
+    ],
+    "zones": [
+      {
+        "label": "CUSTOMERS AND STAFF",
+        "x": 64,
+        "y": 256,
+        "w": 408,
+        "h": 1424,
+        "fill": "#f0f5fd"
+      },
+      {
+        "label": "EDGE, IDENTITY AND MEDIA",
+        "x": 568,
+        "y": 256,
+        "w": 408,
+        "h": 1424,
+        "fill": "#f0f5fd"
+      },
+      {
+        "label": "COMMERCE AND OWNED DATA",
+        "x": 1072,
+        "y": 256,
+        "w": 912,
+        "h": 1424,
+        "fill": "#fffbed"
+      },
+      {
+        "label": "ASYNC WORK AND PARTNERS",
+        "x": 2080,
+        "y": 256,
+        "w": 912,
+        "h": 1424,
+        "fill": "#f0f5fd"
+      }
+    ],
+    "edges": [
+      {
+        "id": "architecture_edge0",
+        "a": {
+          "id": "architecture_clients",
+          "label": "Web storefront\nAndroid / iOS apps",
+          "x": 96,
+          "y": 440,
+          "w": 344,
+          "h": 272,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_edge",
+          "label": "Route 53 / ACM\nCloudFront / AWS WAF",
+          "x": 600,
+          "y": 440,
+          "w": 344,
+          "h": 272,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "architecture_edge1",
+        "a": {
+          "id": "architecture_edge",
+          "label": "Route 53 / ACM\nCloudFront / AWS WAF",
+          "x": 600,
+          "y": 440,
+          "w": 344,
+          "h": 272,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_web",
+          "label": "Next.js on ECS\nSession BFF\nNo DB access",
+          "x": 1104,
+          "y": 440,
+          "w": 344,
+          "h": 272,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "architecture_edge2",
+        "a": {
+          "id": "architecture_web",
+          "label": "Next.js on ECS\nSession BFF\nNo DB access",
+          "x": 1104,
+          "y": 440,
+          "w": 344,
+          "h": 272,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_api",
+          "label": "Kotlin API\nSpring Boot\nCatalog / orders\nPay / track / support",
+          "x": 1608,
+          "y": 440,
+          "w": 344,
+          "h": 300,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "architecture_edge3",
+        "a": {
+          "id": "architecture_api",
+          "label": "Kotlin API\nSpring Boot\nCatalog / orders\nPay / track / support",
+          "x": 1608,
+          "y": 440,
+          "w": 344,
+          "h": 300,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_payment",
+          "label": "Razorpay\nPayment / refund",
+          "x": 2616,
+          "y": 440,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "architecture_edge4",
+        "a": {
+          "id": "architecture_api",
+          "label": "Kotlin API\nSpring Boot\nCatalog / orders\nPay / track / support",
+          "x": 1608,
+          "y": 440,
+          "w": 344,
+          "h": 300,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_db",
+          "label": "PostgreSQL\nMulti-AZ RDS\nTyped + JSONB\nStock / outbox",
+          "x": 1608,
+          "y": 1400,
+          "w": 344,
+          "h": 272,
+          "color": "yellow",
+          "shape": "can"
+        },
+        "label": "",
+        "start": "bottom",
+        "end": "top",
+        "dashed": false
+      },
+      {
+        "id": "architecture_edge5",
+        "a": {
+          "id": "architecture_db",
+          "label": "PostgreSQL\nMulti-AZ RDS\nTyped + JSONB\nStock / outbox",
+          "x": 1608,
+          "y": 1400,
+          "w": 344,
+          "h": 272,
+          "color": "yellow",
+          "shape": "can"
+        },
+        "b": {
+          "id": "architecture_events",
+          "label": "Outbox relay\nEventBridge / SQS\nDedicated DLQs",
+          "x": 2112,
+          "y": 1400,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "architecture_edge6",
+        "a": {
+          "id": "architecture_events",
+          "label": "Outbox relay\nEventBridge / SQS\nDedicated DLQs",
+          "x": 2112,
+          "y": 1400,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_workers",
+          "label": "Kotlin workers\nSpring Boot\nFulfill / refund\nReconcile / retry",
+          "x": 2112,
+          "y": 920,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "top",
+        "end": "bottom",
+        "dashed": true
+      },
+      {
+        "id": "architecture_edge7",
+        "a": {
+          "id": "architecture_workers",
+          "label": "Kotlin workers\nSpring Boot\nFulfill / refund\nReconcile / retry",
+          "x": 2112,
+          "y": 920,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_provider",
+          "label": "Amazon MCF / 3PL\nContracted provider",
+          "x": 2616,
+          "y": 920,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "architecture_edge8",
+        "a": {
+          "id": "architecture_workers",
+          "label": "Kotlin workers\nSpring Boot\nFulfill / refund\nReconcile / retry",
+          "x": 2112,
+          "y": 920,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_messages",
+          "label": "SES / AWS SMS\nIndependent workers",
+          "x": 2616,
+          "y": 1400,
+          "w": 344,
+          "h": 272,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "architecture_edge9",
+        "a": {
+          "id": "architecture_imports",
+          "label": "Kotlin workers\nCatalog imports\nVersioned releases",
+          "x": 1104,
+          "y": 920,
+          "w": 344,
+          "h": 272,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "architecture_cache",
+          "label": "Valkey cache\nRead models only",
+          "x": 1104,
+          "y": 1400,
+          "w": 344,
+          "h": 272,
+          "color": "yellow",
+          "shape": "can"
+        },
+        "label": "",
+        "start": "bottom",
+        "end": "top",
+        "dashed": true
+      }
+    ],
+    "rules": []
+  },
+  {
+    "key": "booking",
+    "title": "A. Booking",
+    "x": 0,
+    "y": 0,
+    "note": "Customer journey through verified payment. Fixed positions keep every step inside this frame.",
+    "w": 3200,
+    "h": 2240,
+    "nodes": [
+      {
+        "id": "booking_clients",
+        "label": "1. Web / Android / iOS\nBrowse and sign in",
+        "x": 96,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_auth",
+        "label": "2. Cognito federation\nGoogle / Microsoft / Apple",
+        "x": 712,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_catalog",
+        "label": "3. Catalog API / Valkey\nListings and current prices",
+        "x": 1328,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_media",
+        "label": "4. Approved product media\nCloudFront delivery",
+        "x": 1944,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_cart",
+        "label": "5. Own cart and address\nResource ownership enforced",
+        "x": 2560,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_quote",
+        "label": "6. Server checkout quote\nTax / shipping / discount",
+        "x": 96,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_accept",
+        "label": "7. Customer accepts quote\nRepricing requires consent",
+        "x": 712,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_reserve",
+        "label": "8. PostgreSQL transaction\nReserve stock / pending order",
+        "x": 1328,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_mapping",
+        "label": "9. Mapped Razorpay order\nStable idempotency key",
+        "x": 1944,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_checkout",
+        "label": "10. Hosted Razorpay checkout\nCustomer completes payment",
+        "x": 2560,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_webhook",
+        "label": "11. Signed captured webhook\nDurable unique inbox",
+        "x": 96,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_validate",
+        "label": "12. Validate payment binding\nOwner / amount / currency",
+        "x": 712,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_paid",
+        "label": "13. Atomic paid transaction\nOrderPaid outbox event",
+        "x": 1328,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_bus",
+        "label": "14. Outbox relay / EventBridge\nFulfillment SQS queue",
+        "x": 1944,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "booking_handoff",
+        "label": "15. Post-Booking handoff\nDispatch only after confirmation",
+        "x": 2560,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      }
+    ],
+    "texts": [
+      {
+        "label": "Read 1–5 left to right, then 6–10, then 11–15. Each row is a separate stage of the same booking lifecycle.",
+        "x": 64,
+        "y": 1856,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Integrity: invalid or ambiguous payment remains pending for reconciliation; browser success never authorizes dispatch.",
+        "x": 64,
+        "y": 1952,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Expiry: late captured payment requires a fresh stock check or compensating refund. Review stock owner and serviceability.",
+        "x": 64,
+        "y": 2048,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [
+      {
+        "label": "DISCOVERY AND IDENTITY",
+        "x": 64,
+        "y": 256,
+        "w": 3072,
+        "h": 416,
+        "fill": "#f0f5fd"
+      },
+      {
+        "label": "QUOTE AND STOCK RESERVATION",
+        "x": 64,
+        "y": 800,
+        "w": 3072,
+        "h": 416,
+        "fill": "#fffbed"
+      },
+      {
+        "label": "PAYMENT AND DURABLE CONFIRMATION",
+        "x": 64,
+        "y": 1344,
+        "w": 3072,
+        "h": 416,
+        "fill": "#f0f5fd"
+      }
+    ],
+    "edges": [
+      {
+        "id": "booking_edge0",
+        "a": {
+          "id": "booking_clients",
+          "label": "1. Web / Android / iOS\nBrowse and sign in",
+          "x": 96,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_auth",
+          "label": "2. Cognito federation\nGoogle / Microsoft / Apple",
+          "x": 712,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge1",
+        "a": {
+          "id": "booking_auth",
+          "label": "2. Cognito federation\nGoogle / Microsoft / Apple",
+          "x": 712,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_catalog",
+          "label": "3. Catalog API / Valkey\nListings and current prices",
+          "x": 1328,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge2",
+        "a": {
+          "id": "booking_catalog",
+          "label": "3. Catalog API / Valkey\nListings and current prices",
+          "x": 1328,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_media",
+          "label": "4. Approved product media\nCloudFront delivery",
+          "x": 1944,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge3",
+        "a": {
+          "id": "booking_media",
+          "label": "4. Approved product media\nCloudFront delivery",
+          "x": 1944,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_cart",
+          "label": "5. Own cart and address\nResource ownership enforced",
+          "x": 2560,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge4",
+        "a": {
+          "id": "booking_quote",
+          "label": "6. Server checkout quote\nTax / shipping / discount",
+          "x": 96,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_accept",
+          "label": "7. Customer accepts quote\nRepricing requires consent",
+          "x": 712,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge5",
+        "a": {
+          "id": "booking_accept",
+          "label": "7. Customer accepts quote\nRepricing requires consent",
+          "x": 712,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_reserve",
+          "label": "8. PostgreSQL transaction\nReserve stock / pending order",
+          "x": 1328,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge6",
+        "a": {
+          "id": "booking_reserve",
+          "label": "8. PostgreSQL transaction\nReserve stock / pending order",
+          "x": 1328,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_mapping",
+          "label": "9. Mapped Razorpay order\nStable idempotency key",
+          "x": 1944,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge7",
+        "a": {
+          "id": "booking_mapping",
+          "label": "9. Mapped Razorpay order\nStable idempotency key",
+          "x": 1944,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_checkout",
+          "label": "10. Hosted Razorpay checkout\nCustomer completes payment",
+          "x": 2560,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge8",
+        "a": {
+          "id": "booking_webhook",
+          "label": "11. Signed captured webhook\nDurable unique inbox",
+          "x": 96,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_validate",
+          "label": "12. Validate payment binding\nOwner / amount / currency",
+          "x": 712,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge9",
+        "a": {
+          "id": "booking_validate",
+          "label": "12. Validate payment binding\nOwner / amount / currency",
+          "x": 712,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_paid",
+          "label": "13. Atomic paid transaction\nOrderPaid outbox event",
+          "x": 1328,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge10",
+        "a": {
+          "id": "booking_paid",
+          "label": "13. Atomic paid transaction\nOrderPaid outbox event",
+          "x": 1328,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_bus",
+          "label": "14. Outbox relay / EventBridge\nFulfillment SQS queue",
+          "x": 1944,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "booking_edge11",
+        "a": {
+          "id": "booking_bus",
+          "label": "14. Outbox relay / EventBridge\nFulfillment SQS queue",
+          "x": 1944,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "booking_handoff",
+          "label": "15. Post-Booking handoff\nDispatch only after confirmation",
+          "x": 2560,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      }
+    ],
+    "rules": []
+  },
+  {
+    "key": "post",
+    "title": "B. Post-Booking Operations",
+    "x": 3520,
+    "y": 0,
+    "note": "Fulfillment, delivery tracking and controlled support actions. Cancellation is agent-only.",
+    "w": 3200,
+    "h": 2240,
+    "nodes": [
+      {
+        "id": "post_paid",
+        "label": "1. OrderPaid / outbox\nEventBridge / SQS",
+        "x": 96,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_worker",
+        "label": "2. Fulfillment worker\nStable merchant request ID",
+        "x": 712,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_provider",
+        "label": "3. Contracted MCF / 3PL\nPack / dispatch / deliver",
+        "x": 1328,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_tracking",
+        "label": "4. Tracking inbox and polling\nNormalized shipment state",
+        "x": 1944,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_view",
+        "label": "5. Customer tracking\nETA / split shipments / support",
+        "x": 2560,
+        "y": 384,
+        "w": 488,
+        "h": 224,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_case",
+        "label": "6. Customer contacts support\nCase only; no order mutation",
+        "x": 96,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_agent",
+        "label": "7. Authorized support agent\nMFA / role / case / reason",
+        "x": 712,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_intent",
+        "label": "8. Audited cancellation intent\nSerialize with dispatch",
+        "x": 1328,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_cancel",
+        "label": "9. Provider cancellation\nAccepted / rejected / pending",
+        "x": 1944,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_reconcile",
+        "label": "10. Ambiguous outcome\nReconcile before retry",
+        "x": 2560,
+        "y": 928,
+        "w": 488,
+        "h": 224,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_eligibility",
+        "label": "11. Confirm refund eligibility\nCancelled or verified return/RTO",
+        "x": 96,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_refund",
+        "label": "12. Refund worker / Razorpay\nDeduplicated refund intent",
+        "x": 712,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_outcome",
+        "label": "13. Signed refund outcome\nValidate / persist / reconcile",
+        "x": 1328,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_status",
+        "label": "14. Customer refund status\nSeparate from shipment status",
+        "x": 1944,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      },
+      {
+        "id": "post_notify",
+        "label": "15. Email and SMS queues\nDelivery outcomes / retries",
+        "x": 2560,
+        "y": 1472,
+        "w": 488,
+        "h": 224,
+        "color": "plain",
+        "shape": "rectangle"
+      }
+    ],
+    "texts": [
+      {
+        "label": "Conditional flow: cancellation acceptance proceeds to eligibility. Pending outcomes reconcile; rejected requests follow the return policy.",
+        "x": 64,
+        "y": 1856,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Customer calls to cancellation/refund execution APIs are forbidden. Opening a support case never automatically cancels.",
+        "x": 64,
+        "y": 1952,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Refunds are bounded by captured money and existing refund intents. Notification failures never undo the order.",
+        "x": 64,
+        "y": 2048,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [
+      {
+        "label": "FULFILLMENT AND TRACKING",
+        "x": 64,
+        "y": 256,
+        "w": 3072,
+        "h": 416,
+        "fill": "#f0f5fd"
+      },
+      {
+        "label": "SUPPORT AND CANCELLATION",
+        "x": 64,
+        "y": 800,
+        "w": 3072,
+        "h": 416,
+        "fill": "#fffbed"
+      },
+      {
+        "label": "ELIGIBILITY, REFUNDS AND COMMUNICATIONS",
+        "x": 64,
+        "y": 1344,
+        "w": 3072,
+        "h": 416,
+        "fill": "#f0f5fd"
+      }
+    ],
+    "edges": [
+      {
+        "id": "post_edge0",
+        "a": {
+          "id": "post_paid",
+          "label": "1. OrderPaid / outbox\nEventBridge / SQS",
+          "x": 96,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_worker",
+          "label": "2. Fulfillment worker\nStable merchant request ID",
+          "x": 712,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge1",
+        "a": {
+          "id": "post_worker",
+          "label": "2. Fulfillment worker\nStable merchant request ID",
+          "x": 712,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_provider",
+          "label": "3. Contracted MCF / 3PL\nPack / dispatch / deliver",
+          "x": 1328,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge2",
+        "a": {
+          "id": "post_provider",
+          "label": "3. Contracted MCF / 3PL\nPack / dispatch / deliver",
+          "x": 1328,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_tracking",
+          "label": "4. Tracking inbox and polling\nNormalized shipment state",
+          "x": 1944,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge3",
+        "a": {
+          "id": "post_tracking",
+          "label": "4. Tracking inbox and polling\nNormalized shipment state",
+          "x": 1944,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_view",
+          "label": "5. Customer tracking\nETA / split shipments / support",
+          "x": 2560,
+          "y": 384,
+          "w": 488,
+          "h": 224,
+          "color": "blue",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge4",
+        "a": {
+          "id": "post_case",
+          "label": "6. Customer contacts support\nCase only; no order mutation",
+          "x": 96,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_agent",
+          "label": "7. Authorized support agent\nMFA / role / case / reason",
+          "x": 712,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge5",
+        "a": {
+          "id": "post_agent",
+          "label": "7. Authorized support agent\nMFA / role / case / reason",
+          "x": 712,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_intent",
+          "label": "8. Audited cancellation intent\nSerialize with dispatch",
+          "x": 1328,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge6",
+        "a": {
+          "id": "post_intent",
+          "label": "8. Audited cancellation intent\nSerialize with dispatch",
+          "x": 1328,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_cancel",
+          "label": "9. Provider cancellation\nAccepted / rejected / pending",
+          "x": 1944,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge7",
+        "a": {
+          "id": "post_cancel",
+          "label": "9. Provider cancellation\nAccepted / rejected / pending",
+          "x": 1944,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_reconcile",
+          "label": "10. Ambiguous outcome\nReconcile before retry",
+          "x": 2560,
+          "y": 928,
+          "w": 488,
+          "h": 224,
+          "color": "yellow",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge8",
+        "a": {
+          "id": "post_eligibility",
+          "label": "11. Confirm refund eligibility\nCancelled or verified return/RTO",
+          "x": 96,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_refund",
+          "label": "12. Refund worker / Razorpay\nDeduplicated refund intent",
+          "x": 712,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge9",
+        "a": {
+          "id": "post_refund",
+          "label": "12. Refund worker / Razorpay\nDeduplicated refund intent",
+          "x": 712,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_outcome",
+          "label": "13. Signed refund outcome\nValidate / persist / reconcile",
+          "x": 1328,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge10",
+        "a": {
+          "id": "post_outcome",
+          "label": "13. Signed refund outcome\nValidate / persist / reconcile",
+          "x": 1328,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_status",
+          "label": "14. Customer refund status\nSeparate from shipment status",
+          "x": 1944,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "post_edge11",
+        "a": {
+          "id": "post_status",
+          "label": "14. Customer refund status\nSeparate from shipment status",
+          "x": 1944,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "b": {
+          "id": "post_notify",
+          "label": "15. Email and SMS queues\nDelivery outcomes / retries",
+          "x": 2560,
+          "y": 1472,
+          "w": 488,
+          "h": 224,
+          "color": "plain",
+          "shape": "rectangle"
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      }
+    ],
+    "rules": []
+  },
+  {
+    "key": "02-login",
+    "title": "02. Federated Login",
+    "x": 0,
+    "y": 2560,
+    "note": "Common identity for web, Android and iOS  /  Public mobile client uses PKCE; web uses a session BFF",
+    "w": 3200,
+    "h": 3840,
+    "nodes": [
+      {
+        "id": "02-login_actor0",
+        "label": "Customer",
+        "x": 64,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "02-login_actor1",
+        "label": "Web BFF / Native app",
+        "x": 576,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "02-login_actor2",
+        "label": "Cognito",
+        "x": 1088,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "02-login_actor3",
+        "label": "Google / Microsoft / Apple",
+        "x": 1600,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "02-login_actor4",
+        "label": "Commerce API",
+        "x": 2112,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "02-login_actor5",
+        "label": "PostgreSQL",
+        "x": 2624,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "02-login_anchor0a",
+        "label": "",
+        "x": 284,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor0b",
+        "label": "",
+        "x": 796,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor1a",
+        "label": "",
+        "x": 796,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor1b",
+        "label": "",
+        "x": 1308,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor2a",
+        "label": "",
+        "x": 1308,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor2b",
+        "label": "",
+        "x": 1820,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor3a",
+        "label": "",
+        "x": 1820,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor3b",
+        "label": "",
+        "x": 1308,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor4a",
+        "label": "",
+        "x": 1308,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor4b",
+        "label": "",
+        "x": 796,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor5a",
+        "label": "",
+        "x": 796,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor5b",
+        "label": "",
+        "x": 1308,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor6a",
+        "label": "",
+        "x": 1308,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor6b",
+        "label": "",
+        "x": 796,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor7a",
+        "label": "",
+        "x": 796,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor7b",
+        "label": "",
+        "x": 2332,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_self8",
+        "label": "9. Validate JWT, scopes, role",
+        "x": 2112,
+        "y": 2024,
+        "w": 448,
+        "h": 160,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "02-login_anchor9a",
+        "label": "",
+        "x": 2332,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor9b",
+        "label": "",
+        "x": 2844,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor10a",
+        "label": "",
+        "x": 2844,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor10b",
+        "label": "",
+        "x": 2332,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor11a",
+        "label": "",
+        "x": 2332,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "02-login_anchor11b",
+        "label": "",
+        "x": 796,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      }
+    ],
+    "texts": [
+      {
+        "label": "1. Choose provider",
+        "x": 308,
+        "y": 488,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "2. Authorize: state, nonce, PKCE",
+        "x": 820,
+        "y": 680,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "3. Federated sign-in",
+        "x": 1332,
+        "y": 872,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "4. Validated provider response",
+        "x": 1332,
+        "y": 1064,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "5. Authorization code",
+        "x": 820,
+        "y": 1256,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "6. Exchange code + verifier",
+        "x": 820,
+        "y": 1448,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "7. Access token + refresh token",
+        "x": 820,
+        "y": 1640,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "8. Call API with access token",
+        "x": 820,
+        "y": 1832,
+        "w": 1496,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "10. Resolve issuer/subject identity; check resource owner",
+        "x": 2356,
+        "y": 2216,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "11. Customer and authorization context",
+        "x": 2356,
+        "y": 2408,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "12. Authorized response",
+        "x": 820,
+        "y": 2600,
+        "w": 1496,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Web: Secure HttpOnly session; tokens stay server-side. Native: system browser and secure token storage. Test personal Outlook and organization tenants; link identities only after verified proof of ownership.",
+        "x": 64,
+        "y": 3520,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [],
+    "edges": [
+      {
+        "id": "02-login_edge0",
+        "a": {
+          "id": "02-login_anchor0a",
+          "label": "",
+          "x": 284,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor0b",
+          "label": "",
+          "x": 796,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "02-login_edge1",
+        "a": {
+          "id": "02-login_anchor1a",
+          "label": "",
+          "x": 796,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor1b",
+          "label": "",
+          "x": 1308,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "02-login_edge2",
+        "a": {
+          "id": "02-login_anchor2a",
+          "label": "",
+          "x": 1308,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor2b",
+          "label": "",
+          "x": 1820,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "02-login_edge3",
+        "a": {
+          "id": "02-login_anchor3a",
+          "label": "",
+          "x": 1820,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor3b",
+          "label": "",
+          "x": 1308,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "02-login_edge4",
+        "a": {
+          "id": "02-login_anchor4a",
+          "label": "",
+          "x": 1308,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor4b",
+          "label": "",
+          "x": 796,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "02-login_edge5",
+        "a": {
+          "id": "02-login_anchor5a",
+          "label": "",
+          "x": 796,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor5b",
+          "label": "",
+          "x": 1308,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "02-login_edge6",
+        "a": {
+          "id": "02-login_anchor6a",
+          "label": "",
+          "x": 1308,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor6b",
+          "label": "",
+          "x": 796,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "02-login_edge7",
+        "a": {
+          "id": "02-login_anchor7a",
+          "label": "",
+          "x": 796,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor7b",
+          "label": "",
+          "x": 2332,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "02-login_edge8",
+        "a": {
+          "id": "02-login_anchor9a",
+          "label": "",
+          "x": 2332,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor9b",
+          "label": "",
+          "x": 2844,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "02-login_edge9",
+        "a": {
+          "id": "02-login_anchor10a",
+          "label": "",
+          "x": 2844,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor10b",
+          "label": "",
+          "x": 2332,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "02-login_edge10",
+        "a": {
+          "id": "02-login_anchor11a",
+          "label": "",
+          "x": 2332,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "02-login_anchor11b",
+          "label": "",
+          "x": 796,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      }
+    ],
+    "rules": [
+      {
+        "x1": 288,
+        "y1": 448,
+        "x2": 288,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 800,
+        "y1": 448,
+        "x2": 800,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1312,
+        "y1": 448,
+        "x2": 1312,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1824,
+        "y1": 448,
+        "x2": 1824,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2336,
+        "y1": 448,
+        "x2": 2336,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2848,
+        "y1": 448,
+        "x2": 2848,
+        "y2": 3456,
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "key": "03-catalog",
+    "title": "03. Catalog and Price Publication",
+    "x": 0,
+    "y": 6720,
+    "note": "Database commit precedes cache publication  /  Outbox + at-least-once processing  /  Versioned releases",
+    "w": 3200,
+    "h": 3840,
+    "nodes": [
+      {
+        "id": "03-catalog_actor0",
+        "label": "Admin / Scheduler S3 source",
+        "x": 64,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "03-catalog_actor1",
+        "label": "Import queue + worker",
+        "x": 576,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "03-catalog_actor2",
+        "label": "PostgreSQL",
+        "x": 1088,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "03-catalog_actor3",
+        "label": "Outbox relay EventBridge",
+        "x": 1600,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "03-catalog_actor4",
+        "label": "Cache queue + worker",
+        "x": 2112,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "03-catalog_actor5",
+        "label": "Valkey / API",
+        "x": 2624,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "03-catalog_anchor0a",
+        "label": "",
+        "x": 284,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor0b",
+        "label": "",
+        "x": 796,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_self1",
+        "label": "2. Deduplicate, validate, stage",
+        "x": 576,
+        "y": 680,
+        "w": 448,
+        "h": 160,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "03-catalog_anchor2a",
+        "label": "",
+        "x": 796,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor2b",
+        "label": "",
+        "x": 1308,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor3a",
+        "label": "",
+        "x": 1308,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor3b",
+        "label": "",
+        "x": 796,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor4a",
+        "label": "",
+        "x": 1820,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor4b",
+        "label": "",
+        "x": 1308,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor5a",
+        "label": "",
+        "x": 1308,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor5b",
+        "label": "",
+        "x": 1820,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor6a",
+        "label": "",
+        "x": 1820,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor6b",
+        "label": "",
+        "x": 2332,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor7a",
+        "label": "",
+        "x": 2332,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor7b",
+        "label": "",
+        "x": 1308,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor8a",
+        "label": "",
+        "x": 1308,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor8b",
+        "label": "",
+        "x": 2332,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor9a",
+        "label": "",
+        "x": 2332,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor9b",
+        "label": "",
+        "x": 2844,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor10a",
+        "label": "",
+        "x": 2332,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_anchor10b",
+        "label": "",
+        "x": 1308,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "03-catalog_self11",
+        "label": "12. Read cache; bounded DB fallback",
+        "x": 2624,
+        "y": 2600,
+        "w": 448,
+        "h": 160,
+        "color": "yellow",
+        "shape": "rectangle"
+      }
+    ],
+    "texts": [
+      {
+        "label": "1. Submit source version + job ID",
+        "x": 308,
+        "y": 488,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "3. Activate release + outbox in one transaction",
+        "x": 820,
+        "y": 872,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "4. Committed version; cache pending",
+        "x": 820,
+        "y": 1064,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "5. Claim committed outbox entries",
+        "x": 1332,
+        "y": 1256,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "6. CatalogPublished(version)",
+        "x": 1332,
+        "y": 1448,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "7. Publish; acknowledge only successful entries",
+        "x": 1844,
+        "y": 1640,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "8. Load authoritative release",
+        "x": 1332,
+        "y": 1832,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "9. Products, prices and visibility",
+        "x": 1332,
+        "y": 2024,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "10. Build immutable views; CAS newer pointer",
+        "x": 2356,
+        "y": 2216,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "11. Record cache publication status",
+        "x": 1332,
+        "y": 2408,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Duplicates and older events are harmless. Failed jobs retry, then DLQ. Reconcile DB/cache versions. Checkout always revalidates live prices and stock; price changes require customer acceptance.",
+        "x": 64,
+        "y": 3520,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [],
+    "edges": [
+      {
+        "id": "03-catalog_edge0",
+        "a": {
+          "id": "03-catalog_anchor0a",
+          "label": "",
+          "x": 284,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor0b",
+          "label": "",
+          "x": 796,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "03-catalog_edge1",
+        "a": {
+          "id": "03-catalog_anchor2a",
+          "label": "",
+          "x": 796,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor2b",
+          "label": "",
+          "x": 1308,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "03-catalog_edge2",
+        "a": {
+          "id": "03-catalog_anchor3a",
+          "label": "",
+          "x": 1308,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor3b",
+          "label": "",
+          "x": 796,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "03-catalog_edge3",
+        "a": {
+          "id": "03-catalog_anchor4a",
+          "label": "",
+          "x": 1820,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor4b",
+          "label": "",
+          "x": 1308,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "03-catalog_edge4",
+        "a": {
+          "id": "03-catalog_anchor5a",
+          "label": "",
+          "x": 1308,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor5b",
+          "label": "",
+          "x": 1820,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "03-catalog_edge5",
+        "a": {
+          "id": "03-catalog_anchor6a",
+          "label": "",
+          "x": 1820,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor6b",
+          "label": "",
+          "x": 2332,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "03-catalog_edge6",
+        "a": {
+          "id": "03-catalog_anchor7a",
+          "label": "",
+          "x": 2332,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor7b",
+          "label": "",
+          "x": 1308,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "03-catalog_edge7",
+        "a": {
+          "id": "03-catalog_anchor8a",
+          "label": "",
+          "x": 1308,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor8b",
+          "label": "",
+          "x": 2332,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "03-catalog_edge8",
+        "a": {
+          "id": "03-catalog_anchor9a",
+          "label": "",
+          "x": 2332,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor9b",
+          "label": "",
+          "x": 2844,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "03-catalog_edge9",
+        "a": {
+          "id": "03-catalog_anchor10a",
+          "label": "",
+          "x": 2332,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "03-catalog_anchor10b",
+          "label": "",
+          "x": 1308,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      }
+    ],
+    "rules": [
+      {
+        "x1": 288,
+        "y1": 448,
+        "x2": 288,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 800,
+        "y1": 448,
+        "x2": 800,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1312,
+        "y1": 448,
+        "x2": 1312,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1824,
+        "y1": 448,
+        "x2": 1824,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2336,
+        "y1": 448,
+        "x2": 2336,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2848,
+        "y1": 448,
+        "x2": 2848,
+        "y2": 3456,
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "key": "04-checkout",
+    "title": "04. Checkout, Payment and Fulfillment",
+    "x": 0,
+    "y": 10880,
+    "note": "Customers pay on Wellisha  /  Captured payment evidence drives order confirmation  /  External outcomes may be pending",
+    "w": 3200,
+    "h": 3840,
+    "nodes": [
+      {
+        "id": "04-checkout_actor0",
+        "label": "Web / Android / iOS",
+        "x": 64,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "04-checkout_actor1",
+        "label": "Commerce API",
+        "x": 576,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "04-checkout_actor2",
+        "label": "PostgreSQL",
+        "x": 1088,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "04-checkout_actor3",
+        "label": "Razorpay",
+        "x": 1600,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "04-checkout_actor4",
+        "label": "Inbox / outbox + workers",
+        "x": 2112,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "04-checkout_actor5",
+        "label": "Fulfillment provider",
+        "x": 2624,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "04-checkout_anchor0a",
+        "label": "",
+        "x": 284,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor0b",
+        "label": "",
+        "x": 796,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor1a",
+        "label": "",
+        "x": 796,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor1b",
+        "label": "",
+        "x": 1308,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor2a",
+        "label": "",
+        "x": 796,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor2b",
+        "label": "",
+        "x": 1820,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor3a",
+        "label": "",
+        "x": 1820,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor3b",
+        "label": "",
+        "x": 796,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor4a",
+        "label": "",
+        "x": 796,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor4b",
+        "label": "",
+        "x": 1308,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor5a",
+        "label": "",
+        "x": 796,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor5b",
+        "label": "",
+        "x": 284,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor6a",
+        "label": "",
+        "x": 284,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor6b",
+        "label": "",
+        "x": 1820,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor7a",
+        "label": "",
+        "x": 1820,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor7b",
+        "label": "",
+        "x": 796,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor8a",
+        "label": "",
+        "x": 796,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor8b",
+        "label": "",
+        "x": 1308,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor9a",
+        "label": "",
+        "x": 796,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor9b",
+        "label": "",
+        "x": 1820,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor10a",
+        "label": "",
+        "x": 2332,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor10b",
+        "label": "",
+        "x": 1308,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor11a",
+        "label": "",
+        "x": 2332,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor11b",
+        "label": "",
+        "x": 2844,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor12a",
+        "label": "",
+        "x": 2844,
+        "y": 2940,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor12b",
+        "label": "",
+        "x": 2332,
+        "y": 2940,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor13a",
+        "label": "",
+        "x": 2332,
+        "y": 3132,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor13b",
+        "label": "",
+        "x": 1308,
+        "y": 3132,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor14a",
+        "label": "",
+        "x": 284,
+        "y": 3324,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "04-checkout_anchor14b",
+        "label": "",
+        "x": 796,
+        "y": 3324,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      }
+    ],
+    "texts": [
+      {
+        "label": "1. Create order: quote + idempotency key",
+        "x": 308,
+        "y": 488,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "2. Reprice; reserve stock; persist pending order",
+        "x": 820,
+        "y": 680,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "3. Create payment order outside DB transaction",
+        "x": 820,
+        "y": 872,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "4. Provider order ID or unknown outcome",
+        "x": 820,
+        "y": 1064,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "5. Persist payment mapping; unknown -> reconcile",
+        "x": 820,
+        "y": 1256,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "6. Checkout details or 202 pending",
+        "x": 308,
+        "y": 1448,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "7. Customer completes payment",
+        "x": 308,
+        "y": 1640,
+        "w": 1496,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "8. Signed captured-payment webhook",
+        "x": 820,
+        "y": 1832,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "9. Verify signature; persist unique inbox",
+        "x": 820,
+        "y": 2024,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "10. Acknowledge durable receipt",
+        "x": 820,
+        "y": 2216,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "11. Validate payment binding; paid + outbox transaction",
+        "x": 1332,
+        "y": 2408,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "12. Create fulfillment using stable merchant ID",
+        "x": 2356,
+        "y": 2600,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "13. Accepted / status / ambiguous result",
+        "x": 2356,
+        "y": 2792,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "14. Persist tracking; reconcile; notification outbox",
+        "x": 1332,
+        "y": 2984,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "15. Read order, payment and shipment status",
+        "x": 308,
+        "y": 3176,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Do not dispatch on browser success alone. Duplicate/out-of-order events cannot repeat effects. Late payment after stock expiry: recheck stock or compensate. Provider timeout: reconcile before retry.",
+        "x": 64,
+        "y": 3520,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [],
+    "edges": [
+      {
+        "id": "04-checkout_edge0",
+        "a": {
+          "id": "04-checkout_anchor0a",
+          "label": "",
+          "x": 284,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor0b",
+          "label": "",
+          "x": 796,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge1",
+        "a": {
+          "id": "04-checkout_anchor1a",
+          "label": "",
+          "x": 796,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor1b",
+          "label": "",
+          "x": 1308,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge2",
+        "a": {
+          "id": "04-checkout_anchor2a",
+          "label": "",
+          "x": 796,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor2b",
+          "label": "",
+          "x": 1820,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge3",
+        "a": {
+          "id": "04-checkout_anchor3a",
+          "label": "",
+          "x": 1820,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor3b",
+          "label": "",
+          "x": 796,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "04-checkout_edge4",
+        "a": {
+          "id": "04-checkout_anchor4a",
+          "label": "",
+          "x": 796,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor4b",
+          "label": "",
+          "x": 1308,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge5",
+        "a": {
+          "id": "04-checkout_anchor5a",
+          "label": "",
+          "x": 796,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor5b",
+          "label": "",
+          "x": 284,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "04-checkout_edge6",
+        "a": {
+          "id": "04-checkout_anchor6a",
+          "label": "",
+          "x": 284,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor6b",
+          "label": "",
+          "x": 1820,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge7",
+        "a": {
+          "id": "04-checkout_anchor7a",
+          "label": "",
+          "x": 1820,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor7b",
+          "label": "",
+          "x": 796,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "04-checkout_edge8",
+        "a": {
+          "id": "04-checkout_anchor8a",
+          "label": "",
+          "x": 796,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor8b",
+          "label": "",
+          "x": 1308,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge9",
+        "a": {
+          "id": "04-checkout_anchor9a",
+          "label": "",
+          "x": 796,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor9b",
+          "label": "",
+          "x": 1820,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "04-checkout_edge10",
+        "a": {
+          "id": "04-checkout_anchor10a",
+          "label": "",
+          "x": 2332,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor10b",
+          "label": "",
+          "x": 1308,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge11",
+        "a": {
+          "id": "04-checkout_anchor11a",
+          "label": "",
+          "x": 2332,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor11b",
+          "label": "",
+          "x": 2844,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "04-checkout_edge12",
+        "a": {
+          "id": "04-checkout_anchor12a",
+          "label": "",
+          "x": 2844,
+          "y": 2940,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor12b",
+          "label": "",
+          "x": 2332,
+          "y": 2940,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "04-checkout_edge13",
+        "a": {
+          "id": "04-checkout_anchor13a",
+          "label": "",
+          "x": 2332,
+          "y": 3132,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor13b",
+          "label": "",
+          "x": 1308,
+          "y": 3132,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "04-checkout_edge14",
+        "a": {
+          "id": "04-checkout_anchor14a",
+          "label": "",
+          "x": 284,
+          "y": 3324,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "04-checkout_anchor14b",
+          "label": "",
+          "x": 796,
+          "y": 3324,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      }
+    ],
+    "rules": [
+      {
+        "x1": 288,
+        "y1": 448,
+        "x2": 288,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 800,
+        "y1": 448,
+        "x2": 800,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1312,
+        "y1": 448,
+        "x2": 1312,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1824,
+        "y1": 448,
+        "x2": 1824,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2336,
+        "y1": 448,
+        "x2": 2336,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2848,
+        "y1": 448,
+        "x2": 2848,
+        "y2": 3456,
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "key": "05-cancellation",
+    "title": "05. Agent Cancellation and Refund",
+    "x": 3520,
+    "y": 2560,
+    "note": "Customers contact support; only authorized agents can cancel  /  Backend RBAC enforces the restriction",
+    "w": 3200,
+    "h": 3840,
+    "nodes": [
+      {
+        "id": "05-cancellation_actor0",
+        "label": "Customer app",
+        "x": 64,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "05-cancellation_actor1",
+        "label": "Support agent Staff console",
+        "x": 576,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "05-cancellation_actor2",
+        "label": "Commerce API",
+        "x": 1088,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "05-cancellation_actor3",
+        "label": "DB inbox/outbox + queue workers",
+        "x": 1600,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "05-cancellation_actor4",
+        "label": "Fulfillment provider",
+        "x": 2112,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "05-cancellation_actor5",
+        "label": "Razorpay",
+        "x": 2624,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "05-cancellation_anchor0a",
+        "label": "",
+        "x": 284,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor0b",
+        "label": "",
+        "x": 1308,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor1a",
+        "label": "",
+        "x": 796,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor1b",
+        "label": "",
+        "x": 1308,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor2a",
+        "label": "",
+        "x": 796,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor2b",
+        "label": "",
+        "x": 1308,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor3a",
+        "label": "",
+        "x": 1308,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor3b",
+        "label": "",
+        "x": 1820,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor4a",
+        "label": "",
+        "x": 1308,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor4b",
+        "label": "",
+        "x": 796,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor5a",
+        "label": "",
+        "x": 1820,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor5b",
+        "label": "",
+        "x": 2332,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor6a",
+        "label": "",
+        "x": 2332,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor6b",
+        "label": "",
+        "x": 1820,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_self7",
+        "label": "8. Confirmed cancel -> refund intent",
+        "x": 1600,
+        "y": 1832,
+        "w": 448,
+        "h": 160,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "05-cancellation_anchor8a",
+        "label": "",
+        "x": 1820,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor8b",
+        "label": "",
+        "x": 2844,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor9a",
+        "label": "",
+        "x": 2844,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor9b",
+        "label": "",
+        "x": 1308,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor10a",
+        "label": "",
+        "x": 1308,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor10b",
+        "label": "",
+        "x": 1820,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor11a",
+        "label": "",
+        "x": 284,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "05-cancellation_anchor11b",
+        "label": "",
+        "x": 1308,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      }
+    ],
+    "texts": [
+      {
+        "label": "1. Create support case; no order mutation",
+        "x": 308,
+        "y": 488,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "2. Read assigned case; verify customer/order",
+        "x": 820,
+        "y": 680,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "3. Agent cancellation: case + reason + key",
+        "x": 820,
+        "y": 872,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "4. Check agent permission; lock; record intent",
+        "x": 1332,
+        "y": 1064,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "5. 202 pending cancellation",
+        "x": 820,
+        "y": 1256,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "6. Cancel / reconcile in-flight submission",
+        "x": 1844,
+        "y": 1448,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "7. Accepted, rejected or pending",
+        "x": 1844,
+        "y": 1640,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "9. Submit deduplicated refund",
+        "x": 1844,
+        "y": 2024,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "10. Signed refund outcome callback",
+        "x": 1332,
+        "y": 2216,
+        "w": 1496,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "11. Durable inbox; validate; notify customer",
+        "x": 1332,
+        "y": 2408,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "12. Read tracking and agent-action status",
+        "x": 308,
+        "y": 2600,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Customer call to cancellation API -> 403. A support case never automatically cancels an order. Manual provider-portal actions require an agent audit record and verified reconciliation before completion.",
+        "x": 64,
+        "y": 3520,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [],
+    "edges": [
+      {
+        "id": "05-cancellation_edge0",
+        "a": {
+          "id": "05-cancellation_anchor0a",
+          "label": "",
+          "x": 284,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor0b",
+          "label": "",
+          "x": 1308,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "05-cancellation_edge1",
+        "a": {
+          "id": "05-cancellation_anchor1a",
+          "label": "",
+          "x": 796,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor1b",
+          "label": "",
+          "x": 1308,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "05-cancellation_edge2",
+        "a": {
+          "id": "05-cancellation_anchor2a",
+          "label": "",
+          "x": 796,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor2b",
+          "label": "",
+          "x": 1308,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "05-cancellation_edge3",
+        "a": {
+          "id": "05-cancellation_anchor3a",
+          "label": "",
+          "x": 1308,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor3b",
+          "label": "",
+          "x": 1820,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "05-cancellation_edge4",
+        "a": {
+          "id": "05-cancellation_anchor4a",
+          "label": "",
+          "x": 1308,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor4b",
+          "label": "",
+          "x": 796,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "05-cancellation_edge5",
+        "a": {
+          "id": "05-cancellation_anchor5a",
+          "label": "",
+          "x": 1820,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor5b",
+          "label": "",
+          "x": 2332,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "05-cancellation_edge6",
+        "a": {
+          "id": "05-cancellation_anchor6a",
+          "label": "",
+          "x": 2332,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor6b",
+          "label": "",
+          "x": 1820,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "05-cancellation_edge7",
+        "a": {
+          "id": "05-cancellation_anchor8a",
+          "label": "",
+          "x": 1820,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor8b",
+          "label": "",
+          "x": 2844,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "05-cancellation_edge8",
+        "a": {
+          "id": "05-cancellation_anchor9a",
+          "label": "",
+          "x": 2844,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor9b",
+          "label": "",
+          "x": 1308,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "05-cancellation_edge9",
+        "a": {
+          "id": "05-cancellation_anchor10a",
+          "label": "",
+          "x": 1308,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor10b",
+          "label": "",
+          "x": 1820,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "05-cancellation_edge10",
+        "a": {
+          "id": "05-cancellation_anchor11a",
+          "label": "",
+          "x": 284,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "05-cancellation_anchor11b",
+          "label": "",
+          "x": 1308,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      }
+    ],
+    "rules": [
+      {
+        "x1": 288,
+        "y1": 448,
+        "x2": 288,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 800,
+        "y1": 448,
+        "x2": 800,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1312,
+        "y1": 448,
+        "x2": 1312,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1824,
+        "y1": 448,
+        "x2": 1824,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2336,
+        "y1": 448,
+        "x2": 2336,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2848,
+        "y1": 448,
+        "x2": 2848,
+        "y2": 3456,
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "key": "06-notifications",
+    "title": "06. Asynchronous Email and SMS",
+    "x": 3520,
+    "y": 10880,
+    "note": "Notifications never block checkout or fulfillment  /  Separate channel queues and delivery tracking",
+    "w": 3200,
+    "h": 3840,
+    "nodes": [
+      {
+        "id": "06-notifications_actor0",
+        "label": "Commerce transaction",
+        "x": 64,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "06-notifications_actor1",
+        "label": "DB outbox",
+        "x": 576,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "06-notifications_actor2",
+        "label": "Relay + EventBridge",
+        "x": 1088,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "06-notifications_actor3",
+        "label": "Email / SMS queues + DLQs",
+        "x": 1600,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "06-notifications_actor4",
+        "label": "Channel workers",
+        "x": 2112,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "06-notifications_actor5",
+        "label": "SES / AWS SMS",
+        "x": 2624,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "06-notifications_anchor0a",
+        "label": "",
+        "x": 284,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor0b",
+        "label": "",
+        "x": 796,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor1a",
+        "label": "",
+        "x": 1308,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor1b",
+        "label": "",
+        "x": 796,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor2a",
+        "label": "",
+        "x": 796,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor2b",
+        "label": "",
+        "x": 1308,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor3a",
+        "label": "",
+        "x": 1308,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor3b",
+        "label": "",
+        "x": 1820,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor4a",
+        "label": "",
+        "x": 1820,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor4b",
+        "label": "",
+        "x": 2332,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor5a",
+        "label": "",
+        "x": 2332,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor5b",
+        "label": "",
+        "x": 796,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor6a",
+        "label": "",
+        "x": 2332,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor6b",
+        "label": "",
+        "x": 2844,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor7a",
+        "label": "",
+        "x": 2844,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor7b",
+        "label": "",
+        "x": 2332,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor8a",
+        "label": "",
+        "x": 2332,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor8b",
+        "label": "",
+        "x": 796,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor9a",
+        "label": "",
+        "x": 2844,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor9b",
+        "label": "",
+        "x": 1820,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor10a",
+        "label": "",
+        "x": 1820,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor10b",
+        "label": "",
+        "x": 2332,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor11a",
+        "label": "",
+        "x": 2332,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "06-notifications_anchor11b",
+        "label": "",
+        "x": 796,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      }
+    ],
+    "texts": [
+      {
+        "label": "1. Commit business state + notification event",
+        "x": 308,
+        "y": 488,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "2. Claim committed event",
+        "x": 820,
+        "y": 680,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "3. Order / shipment / refund event",
+        "x": 820,
+        "y": 872,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "4. Fan out to independent channels",
+        "x": 1332,
+        "y": 1064,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "5. Deliver at least once",
+        "x": 1844,
+        "y": 1256,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "6. Resolve consent/template; record unique send intent",
+        "x": 820,
+        "y": 1448,
+        "w": 1496,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "7. Send email or registered SMS",
+        "x": 2356,
+        "y": 1640,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "8. Provider acceptance / message ID",
+        "x": 2356,
+        "y": 1832,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "9. Store sent / unknown / failed attempt",
+        "x": 820,
+        "y": 2024,
+        "w": 1496,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "10. Delivery feedback through event adapter",
+        "x": 1844,
+        "y": 2216,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "11. Process receipt / retry / DLQ",
+        "x": 1844,
+        "y": 2408,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "12. Update delivery outcome; suppress invalid recipients",
+        "x": 820,
+        "y": 2600,
+        "w": 1496,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Send acceptance is not delivery. Persistent dedupe limits repeats; ambiguous sends need a defined retry policy. SES production access; India SMS entity/template registration; marketing consent is separate.",
+        "x": 64,
+        "y": 3520,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [],
+    "edges": [
+      {
+        "id": "06-notifications_edge0",
+        "a": {
+          "id": "06-notifications_anchor0a",
+          "label": "",
+          "x": 284,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor0b",
+          "label": "",
+          "x": 796,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "06-notifications_edge1",
+        "a": {
+          "id": "06-notifications_anchor1a",
+          "label": "",
+          "x": 1308,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor1b",
+          "label": "",
+          "x": 796,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "06-notifications_edge2",
+        "a": {
+          "id": "06-notifications_anchor2a",
+          "label": "",
+          "x": 796,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor2b",
+          "label": "",
+          "x": 1308,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "06-notifications_edge3",
+        "a": {
+          "id": "06-notifications_anchor3a",
+          "label": "",
+          "x": 1308,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor3b",
+          "label": "",
+          "x": 1820,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "06-notifications_edge4",
+        "a": {
+          "id": "06-notifications_anchor4a",
+          "label": "",
+          "x": 1820,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor4b",
+          "label": "",
+          "x": 2332,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "06-notifications_edge5",
+        "a": {
+          "id": "06-notifications_anchor5a",
+          "label": "",
+          "x": 2332,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor5b",
+          "label": "",
+          "x": 796,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "06-notifications_edge6",
+        "a": {
+          "id": "06-notifications_anchor6a",
+          "label": "",
+          "x": 2332,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor6b",
+          "label": "",
+          "x": 2844,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "06-notifications_edge7",
+        "a": {
+          "id": "06-notifications_anchor7a",
+          "label": "",
+          "x": 2844,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor7b",
+          "label": "",
+          "x": 2332,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "06-notifications_edge8",
+        "a": {
+          "id": "06-notifications_anchor8a",
+          "label": "",
+          "x": 2332,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor8b",
+          "label": "",
+          "x": 796,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "06-notifications_edge9",
+        "a": {
+          "id": "06-notifications_anchor9a",
+          "label": "",
+          "x": 2844,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor9b",
+          "label": "",
+          "x": 1820,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "06-notifications_edge10",
+        "a": {
+          "id": "06-notifications_anchor10a",
+          "label": "",
+          "x": 1820,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor10b",
+          "label": "",
+          "x": 2332,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "06-notifications_edge11",
+        "a": {
+          "id": "06-notifications_anchor11a",
+          "label": "",
+          "x": 2332,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "06-notifications_anchor11b",
+          "label": "",
+          "x": 796,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      }
+    ],
+    "rules": [
+      {
+        "x1": 288,
+        "y1": 448,
+        "x2": 288,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 800,
+        "y1": 448,
+        "x2": 800,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1312,
+        "y1": 448,
+        "x2": 1312,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1824,
+        "y1": 448,
+        "x2": 1824,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2336,
+        "y1": 448,
+        "x2": 2336,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2848,
+        "y1": 448,
+        "x2": 2848,
+        "y2": 3456,
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "key": "07-tracking",
+    "title": "07. Customer Delivery Tracking",
+    "x": 3520,
+    "y": 6720,
+    "note": "One tracking experience across web, Android and iOS  /  Shipment-level timeline, ETA and last update",
+    "w": 3200,
+    "h": 3840,
+    "nodes": [
+      {
+        "id": "07-tracking_actor0",
+        "label": "Carrier / fulfillment",
+        "x": 64,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "07-tracking_actor1",
+        "label": "Webhook API + durable inbox",
+        "x": 576,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "07-tracking_actor2",
+        "label": "Tracking worker",
+        "x": 1088,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "07-tracking_actor3",
+        "label": "PostgreSQL",
+        "x": 1600,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "07-tracking_actor4",
+        "label": "Commerce API",
+        "x": 2112,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "07-tracking_actor5",
+        "label": "Customer app",
+        "x": 2624,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "07-tracking_anchor0a",
+        "label": "",
+        "x": 284,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor0b",
+        "label": "",
+        "x": 796,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor1a",
+        "label": "",
+        "x": 796,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor1b",
+        "label": "",
+        "x": 1820,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor2a",
+        "label": "",
+        "x": 796,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor2b",
+        "label": "",
+        "x": 284,
+        "y": 1020,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor3a",
+        "label": "",
+        "x": 1308,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor3b",
+        "label": "",
+        "x": 1820,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor4a",
+        "label": "",
+        "x": 1308,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor4b",
+        "label": "",
+        "x": 1820,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor5a",
+        "label": "",
+        "x": 1308,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor5b",
+        "label": "",
+        "x": 284,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor6a",
+        "label": "",
+        "x": 284,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor6b",
+        "label": "",
+        "x": 1308,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor7a",
+        "label": "",
+        "x": 2844,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor7b",
+        "label": "",
+        "x": 2332,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor8a",
+        "label": "",
+        "x": 2332,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor8b",
+        "label": "",
+        "x": 1820,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor9a",
+        "label": "",
+        "x": 1820,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor9b",
+        "label": "",
+        "x": 2332,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor10a",
+        "label": "",
+        "x": 2332,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor10b",
+        "label": "",
+        "x": 2844,
+        "y": 2556,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor11a",
+        "label": "",
+        "x": 2844,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "07-tracking_anchor11b",
+        "label": "",
+        "x": 2332,
+        "y": 2748,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      }
+    ],
+    "texts": [
+      {
+        "label": "1. Signed shipment event",
+        "x": 308,
+        "y": 488,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "2. Verify signature; store unique event",
+        "x": 820,
+        "y": 680,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "3. Acknowledge durable receipt",
+        "x": 308,
+        "y": 872,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "4. Claim inbox event; deduplicate",
+        "x": 1332,
+        "y": 1064,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "5. Normalize status; persist timeline + outbox",
+        "x": 1332,
+        "y": 1256,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "6. Scheduled polling for missing/stale events",
+        "x": 308,
+        "y": 1448,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "7. Current provider shipment state",
+        "x": 308,
+        "y": 1640,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "8. GET own order tracking; access token",
+        "x": 2356,
+        "y": 1832,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "9. Check ownership; read each shipment",
+        "x": 1844,
+        "y": 2024,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "10. Timeline, ETA, last update, exceptions",
+        "x": 1844,
+        "y": 2216,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "11. Tracking view; contact-support link",
+        "x": 2356,
+        "y": 2408,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "12. Refresh with ETag; back off offline",
+        "x": 2356,
+        "y": 2600,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "No customer cancellation action. Split shipments remain separate; stale data is labeled. Do not regress shipment state for late events or expose another customer's order by tracking ID.",
+        "x": 64,
+        "y": 3520,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [],
+    "edges": [
+      {
+        "id": "07-tracking_edge0",
+        "a": {
+          "id": "07-tracking_anchor0a",
+          "label": "",
+          "x": 284,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor0b",
+          "label": "",
+          "x": 796,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "07-tracking_edge1",
+        "a": {
+          "id": "07-tracking_anchor1a",
+          "label": "",
+          "x": 796,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor1b",
+          "label": "",
+          "x": 1820,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "07-tracking_edge2",
+        "a": {
+          "id": "07-tracking_anchor2a",
+          "label": "",
+          "x": 796,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor2b",
+          "label": "",
+          "x": 284,
+          "y": 1020,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "07-tracking_edge3",
+        "a": {
+          "id": "07-tracking_anchor3a",
+          "label": "",
+          "x": 1308,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor3b",
+          "label": "",
+          "x": 1820,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "07-tracking_edge4",
+        "a": {
+          "id": "07-tracking_anchor4a",
+          "label": "",
+          "x": 1308,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor4b",
+          "label": "",
+          "x": 1820,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "07-tracking_edge5",
+        "a": {
+          "id": "07-tracking_anchor5a",
+          "label": "",
+          "x": 1308,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor5b",
+          "label": "",
+          "x": 284,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "07-tracking_edge6",
+        "a": {
+          "id": "07-tracking_anchor6a",
+          "label": "",
+          "x": 284,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor6b",
+          "label": "",
+          "x": 1308,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "07-tracking_edge7",
+        "a": {
+          "id": "07-tracking_anchor7a",
+          "label": "",
+          "x": 2844,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor7b",
+          "label": "",
+          "x": 2332,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "07-tracking_edge8",
+        "a": {
+          "id": "07-tracking_anchor8a",
+          "label": "",
+          "x": 2332,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor8b",
+          "label": "",
+          "x": 1820,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "07-tracking_edge9",
+        "a": {
+          "id": "07-tracking_anchor9a",
+          "label": "",
+          "x": 1820,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor9b",
+          "label": "",
+          "x": 2332,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "07-tracking_edge10",
+        "a": {
+          "id": "07-tracking_anchor10a",
+          "label": "",
+          "x": 2332,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor10b",
+          "label": "",
+          "x": 2844,
+          "y": 2556,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "07-tracking_edge11",
+        "a": {
+          "id": "07-tracking_anchor11a",
+          "label": "",
+          "x": 2844,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "07-tracking_anchor11b",
+          "label": "",
+          "x": 2332,
+          "y": 2748,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      }
+    ],
+    "rules": [
+      {
+        "x1": 288,
+        "y1": 448,
+        "x2": 288,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 800,
+        "y1": 448,
+        "x2": 800,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1312,
+        "y1": 448,
+        "x2": 1312,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1824,
+        "y1": 448,
+        "x2": 1824,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2336,
+        "y1": 448,
+        "x2": 2336,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2848,
+        "y1": 448,
+        "x2": 2848,
+        "y2": 3456,
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "key": "10-media",
+    "title": "10. Product Media Publication",
+    "x": 0,
+    "y": 15040,
+    "note": "Approved product identity across web, Android and iOS  /  Originals preserved; delivery assets versioned",
+    "w": 3200,
+    "h": 3840,
+    "nodes": [
+      {
+        "id": "10-media_actor0",
+        "label": "Merchandising",
+        "x": 64,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "10-media_actor1",
+        "label": "S3 master assets",
+        "x": 576,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "10-media_actor2",
+        "label": "EventBridge / SQS Media worker",
+        "x": 1088,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "10-media_actor3",
+        "label": "Image processing / MediaConvert",
+        "x": 1600,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "10-media_actor4",
+        "label": "Catalog media records",
+        "x": 2112,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "10-media_actor5",
+        "label": "CloudFront / clients",
+        "x": 2624,
+        "y": 288,
+        "w": 448,
+        "h": 160,
+        "color": "blue",
+        "shape": "rectangle"
+      },
+      {
+        "id": "10-media_anchor0a",
+        "label": "",
+        "x": 284,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor0b",
+        "label": "",
+        "x": 796,
+        "y": 636,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor1a",
+        "label": "",
+        "x": 796,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor1b",
+        "label": "",
+        "x": 1308,
+        "y": 828,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_self2",
+        "label": "3. Validate type, size, metadata; deduplicate",
+        "x": 1088,
+        "y": 872,
+        "w": 448,
+        "h": 160,
+        "color": "yellow",
+        "shape": "rectangle"
+      },
+      {
+        "id": "10-media_anchor3a",
+        "label": "",
+        "x": 1308,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor3b",
+        "label": "",
+        "x": 1820,
+        "y": 1212,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor4a",
+        "label": "",
+        "x": 1820,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor4b",
+        "label": "",
+        "x": 796,
+        "y": 1404,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor5a",
+        "label": "",
+        "x": 1820,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor5b",
+        "label": "",
+        "x": 1308,
+        "y": 1596,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor6a",
+        "label": "",
+        "x": 1308,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor6b",
+        "label": "",
+        "x": 2332,
+        "y": 1788,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor7a",
+        "label": "",
+        "x": 284,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor7b",
+        "label": "",
+        "x": 2332,
+        "y": 1980,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor8a",
+        "label": "",
+        "x": 2332,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor8b",
+        "label": "",
+        "x": 2844,
+        "y": 2172,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor9a",
+        "label": "",
+        "x": 2844,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_anchor9b",
+        "label": "",
+        "x": 796,
+        "y": 2364,
+        "w": 8,
+        "h": 8,
+        "color": "neutral",
+        "shape": "rectangle",
+        "anchor": true
+      },
+      {
+        "id": "10-media_self10",
+        "label": "11. Choose viewport size / supported video format",
+        "x": 2624,
+        "y": 2408,
+        "w": 448,
+        "h": 160,
+        "color": "yellow",
+        "shape": "rectangle"
+      }
+    ],
+    "texts": [
+      {
+        "label": "1. Upload original / generated review master",
+        "x": 308,
+        "y": 488,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "2. Object-created event + asset version",
+        "x": 820,
+        "y": 680,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "4. Create bounded image/video derivatives",
+        "x": 1332,
+        "y": 1064,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "5. Write derivatives to separate output prefix",
+        "x": 820,
+        "y": 1256,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "6. Completion / failure event",
+        "x": 1332,
+        "y": 1448,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "7. Record ready variants; still unpublished",
+        "x": 1332,
+        "y": 1640,
+        "w": 984,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "8. Review branding, labels, video; approve version",
+        "x": 308,
+        "y": 1832,
+        "w": 2008,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "9. Publish immutable URLs + dimensions + alt text",
+        "x": 2356,
+        "y": 2024,
+        "w": 472,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "10. Fetch approved derivative through origin access",
+        "x": 820,
+        "y": 2216,
+        "w": 2008,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Generated packaging is a mockup until approved. No processing loop: source and derivative prefixes differ. Only public product media is CDN-readable; invoices, imports and customer data remain private.",
+        "x": 64,
+        "y": 3520,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [],
+    "edges": [
+      {
+        "id": "10-media_edge0",
+        "a": {
+          "id": "10-media_anchor0a",
+          "label": "",
+          "x": 284,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor0b",
+          "label": "",
+          "x": 796,
+          "y": 636,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "10-media_edge1",
+        "a": {
+          "id": "10-media_anchor1a",
+          "label": "",
+          "x": 796,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor1b",
+          "label": "",
+          "x": 1308,
+          "y": 828,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "10-media_edge2",
+        "a": {
+          "id": "10-media_anchor3a",
+          "label": "",
+          "x": 1308,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor3b",
+          "label": "",
+          "x": 1820,
+          "y": 1212,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "10-media_edge3",
+        "a": {
+          "id": "10-media_anchor4a",
+          "label": "",
+          "x": 1820,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor4b",
+          "label": "",
+          "x": 796,
+          "y": 1404,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      },
+      {
+        "id": "10-media_edge4",
+        "a": {
+          "id": "10-media_anchor5a",
+          "label": "",
+          "x": 1820,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor5b",
+          "label": "",
+          "x": 1308,
+          "y": 1596,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": true
+      },
+      {
+        "id": "10-media_edge5",
+        "a": {
+          "id": "10-media_anchor6a",
+          "label": "",
+          "x": 1308,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor6b",
+          "label": "",
+          "x": 2332,
+          "y": 1788,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "10-media_edge6",
+        "a": {
+          "id": "10-media_anchor7a",
+          "label": "",
+          "x": 284,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor7b",
+          "label": "",
+          "x": 2332,
+          "y": 1980,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": false
+      },
+      {
+        "id": "10-media_edge7",
+        "a": {
+          "id": "10-media_anchor8a",
+          "label": "",
+          "x": 2332,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor8b",
+          "label": "",
+          "x": 2844,
+          "y": 2172,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "dashed": true
+      },
+      {
+        "id": "10-media_edge8",
+        "a": {
+          "id": "10-media_anchor9a",
+          "label": "",
+          "x": 2844,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "b": {
+          "id": "10-media_anchor9b",
+          "label": "",
+          "x": 796,
+          "y": 2364,
+          "w": 8,
+          "h": 8,
+          "color": "neutral",
+          "shape": "rectangle",
+          "anchor": true
+        },
+        "label": "",
+        "start": "left",
+        "end": "right",
+        "dashed": false
+      }
+    ],
+    "rules": [
+      {
+        "x1": 288,
+        "y1": 448,
+        "x2": 288,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 800,
+        "y1": 448,
+        "x2": 800,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1312,
+        "y1": 448,
+        "x2": 1312,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 1824,
+        "y1": 448,
+        "x2": 1824,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2336,
+        "y1": 448,
+        "x2": 2336,
+        "y2": 3456,
+        "dashed": true
+      },
+      {
+        "x1": 2848,
+        "y1": 448,
+        "x2": 2848,
+        "y2": 3456,
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "key": "13-stack",
+    "title": "13. Kotlin Backend and PostgreSQL Flexibility",
+    "x": 3520,
+    "y": -2560,
+    "note": "Confirmed: Kotlin + Spring Boot and PostgreSQL. Design decisions guide implementation; APIs are not implemented yet.",
+    "w": 3200,
+    "h": 2240,
+    "nodes": [],
+    "texts": [
+      {
+        "label": "Kotlin + Spring Boot APIs and workers. JVM 21 / Corretto proposed. Spring Security validates Cognito tokens; OpenAPI generates web/mobile clients.",
+        "x": 96,
+        "y": 464,
+        "w": 928,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Typed tables for orders, money, stock and ownership. Validated, versioned JSONB for optional product attributes and partner metadata. Index actual queries.",
+        "x": 1136,
+        "y": 464,
+        "w": 928,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Flyway versioned migrations in one deployment job. Add fields first; backfill; switch readers/writers; remove old fields later. Rehearse migrations and restores.",
+        "x": 2176,
+        "y": 464,
+        "w": 928,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Repository boundaries and parameterized SQL. Allowlisted filters/sorts, cursor pagination and query-plan checks. Add targeted reporting queries without exposing database models.",
+        "x": 96,
+        "y": 1280,
+        "w": 928,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Catalog, commerce, payment and fulfillment own their tables and writes. One PostgreSQL database initially; explicit service operations keep future extraction possible.",
+        "x": 1136,
+        "y": 1280,
+        "w": 928,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "Check customer ownership on every request. Staff MFA and restricted permissions. Least-privilege DB roles, audited refunds, exact money, unique keys and atomic stock/payment transitions.",
+        "x": 2176,
+        "y": 1280,
+        "w": 928,
+        "size": 33,
+        "bold": false
+      },
+      {
+        "label": "S3 stores media, PDFs and large payloads; PostgreSQL stores searchable metadata and object references. JSONB supplements typed tables.",
+        "x": 64,
+        "y": 2016,
+        "w": 3072,
+        "size": 33,
+        "bold": false
+      }
+    ],
+    "zones": [
+      {
+        "label": "Backend stack",
+        "x": 64,
+        "y": 320,
+        "w": 992,
+        "h": 736,
+        "fill": "#9CE6FF"
+      },
+      {
+        "label": "Flexible PostgreSQL data",
+        "x": 1104,
+        "y": 320,
+        "w": 992,
+        "h": 736,
+        "fill": "#FFE86D"
+      },
+      {
+        "label": "Safe schema evolution",
+        "x": 2144,
+        "y": 320,
+        "w": 992,
+        "h": 736,
+        "fill": "#B8ACFB"
+      },
+      {
+        "label": "Flexible queries",
+        "x": 64,
+        "y": 1136,
+        "w": 992,
+        "h": 736,
+        "fill": "#FFE86D"
+      },
+      {
+        "label": "Module boundaries",
+        "x": 1104,
+        "y": 1136,
+        "w": 992,
+        "h": 736,
+        "fill": "#B8ACFB"
+      },
+      {
+        "label": "Security and integrity",
+        "x": 2144,
+        "y": 1136,
+        "w": 992,
+        "h": 736,
+        "fill": "#9CE6FF"
+      }
+    ],
+    "edges": [],
+    "rules": []
+  }
+]

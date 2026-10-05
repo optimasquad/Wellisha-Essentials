@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(CommerceController::class,properties=["CHECKOUT_ENABLED=false"])
-@Import(CognitoApiSecurityConfiguration::class,ApiExceptionHandler::class,RequestLoggingFilter::class)
+@Import(CognitoApiSecurityConfiguration::class,ApiExceptionHandler::class,RequestLoggingFilter::class,RequestBodyLimitFilter::class)
 class CustomerApiHttpTest {
     @Autowired lateinit var mvc: MockMvc
     @MockitoBean lateinit var customers: CustomerAddressRepository
@@ -62,5 +62,21 @@ class CustomerApiHttpTest {
     @Test fun staffBookingCannotBeExecutedByCustomer() {
         mvc.perform(post("/v1/staff/packages/p1/ready").with(auth())).andExpect(status().isForbidden)
     }
+    @Test fun oversizedBodyIsRejectedBeforeCustomerOrOrderAccess() {
+        mvc.perform(post("/v1/me/addresses").with(auth()).contentType("application/json")
+            .content(ByteArray(RequestBodyLimitFilter.MAX_BODY_BYTES + 1)))
+            .andExpect(status().isPayloadTooLarge)
+            .andExpect(jsonPath("$.code").value("REQUEST_BODY_TOO_LARGE"))
+            .andExpect(jsonPath("$.correlationId").isNotEmpty)
+            .andExpect(header().exists("X-Correlation-ID"))
+            .andExpect(header().string("Cache-Control","no-store"))
+        verifyNoInteractions(customers, commerce)
+    }
+    @Test fun compressedBodyIsRejectedBeforeCustomerOrOrderAccess() {
+        mvc.perform(post("/v1/me/addresses").with(auth()).contentType("application/json")
+            .header("Content-Encoding","gzip").content(byteArrayOf(1,2,3)))
+            .andExpect(status().isUnsupportedMediaType)
+            .andExpect(jsonPath("$.code").value("UNSUPPORTED_CONTENT_ENCODING"))
+        verifyNoInteractions(customers, commerce)
+    }
 }
-

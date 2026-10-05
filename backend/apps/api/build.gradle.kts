@@ -13,6 +13,7 @@ dependencies {
 }
 tasks.test { exclude("**/*PostgresTest*") }
 tasks.processTestResources { from(project(":apps:schema").file("src/main/resources")) { include("db/**") } }
+tasks.processTestResources { from(rootProject.file("contracts")) { include("openapi.json") } }
 tasks.register<Test>("integrationTest") {
     description = "Real PostgreSQL HTTP/security tests. Requires Docker; never silently skipped."
     group = "verification"

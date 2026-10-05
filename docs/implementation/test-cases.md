@@ -1,6 +1,12 @@
 # Wellisha test-case specification
 
-Status: 78 planned cases; executable tests are not implemented or run. Link each endpoint/business invariant to work package, test name, owner and CI evidence. Add cases for changed requirements and discovered bugs; coverage percentages alone do not prove completeness.
+Status: 78 planned acceptance cases; a subset has executable coverage. See [execution status](execution-status.md) for verified results and open gates. Link each endpoint/business invariant to work package, test name, owner and CI evidence. Add cases for changed requirements and discovered bugs; coverage percentages alone do not prove completeness.
+
+October 5 resumed verification: all nine `CustomerOrderPostgresTest` scenarios
+passed on isolated PostgreSQL 17.9, including owned resources, address versions,
+order idempotency and concurrent stock writes. Three `CommerceContractHttpTest`
+tests passed for route parity, successful response serialization and error/empty
+response shapes. These results cover a foundation subset, not all planned cases.
 
 Use Kotlin/JUnit, Spring HTTP/security, real PostgreSQL Testcontainers with Flyway, WireMock provider HTTP stubs, Playwright, approved native device tooling and isolated AWS staging. Integration tests must inspect both HTTP results and database state. Seed two customers and separate staff identities. SQL injection tests exercise the real repository/database path, rather than mocking SQL away.
 
@@ -24,7 +30,7 @@ Use Kotlin/JUnit, Spring HTTP/security, real PostgreSQL Testcontainers with Flyw
 | ID | Suggested suite | Scenario | Expected result |
 | --- | --- | --- | --- |
 | I01 | MigrationIT | Clean install and repeat Flyway run | Expected tables/constraints/indexes; repeat safe |
-| I02 | LegacyMigrationIT | Existing cuid/Float records/provider references | Mapped IDs and reconciled money; discrepancies flagged |
+| I02 | SchemaIsolationIT | Initialize the fresh commerce namespace alongside unrelated tables | Unrelated schemas/data remain unchanged; no legacy data import |
 | I03 | SchemaCompatibilityIT | Old readers with expanded schema | Rolling deploy/rollback remains compatible |
 | I04 | RuntimePrivilegesIT | DDL/grant/unrelated schema access attempts | Denied; no superuser/schema ownership |
 | I05 | TokenValidationIT | Wrong issuer/signature/client/token type or expiry | 401 and no protected mutation |

@@ -24,6 +24,7 @@ import com.wellisha.commerce.*
 
 @SpringBootTest(properties=[
     "spring.profiles.active=test",
+    "spring.flyway.enabled=false", // The isolated schema is initialized explicitly before each test.
     "COGNITO_ISSUER=https://cognito-idp.ap-south-1.amazonaws.com/test_pool",
     "COGNITO_CLIENT_ID=test-client",
     "CHECKOUT_ENABLED=true"
